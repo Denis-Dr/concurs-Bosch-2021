@@ -27,7 +27,7 @@ class Banda:
     def setInaltimeSectiuneJos(self, valoare):
         self.inaltimeSectiune = int(valoare)
 
-    def CalculDistantaFataDeBanda(self, lungimeCadru):
+    def CalculDistantaFataDeBanda(self, lungimeCadru): # versiunea veche a functiei -> de modificat
         if self.centre.size == 2:
             self.DistantaBandaFrame = self.centre[1] - self.centre[0]
             print("La " + str(self.nume) + " - distanta dintre banda dreapta si cea stanga este: " + str(
