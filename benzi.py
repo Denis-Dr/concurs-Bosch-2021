@@ -8,15 +8,13 @@ matrice 3x2 cu abscisele centrelor. Inaltimile centrelor sunt prestabilite in fi
 
 class Banda:
     def __init__(self):
-        self.centreSectiuni = [[-1, -1], [-1, -1], [-1, -1]]  # resetam banda[][] dupa fiecare cadru
+        self.centreSectiuni = [[-1, -1], [-1, -1], [-1, -1]]  # resetam centreSectiuni[][] dupa fiecare cadru
 
         self.inaltimeSectiuneSus = 0
         self.inaltimeSectiuneMijloc = 0
         self.inaltimeSectiuneJos = 0
 
 
-    def SetMijlocCalculat(self, mijloc):
-        self.mijlocCalculat = mijloc
 
     def setInaltimeSectiuneSus(self, valoare):
         self.inaltimeSectiune = int(valoare)
@@ -49,8 +47,7 @@ class Banda:
                 self.sfarsit = i - 1
                 if (self.sfarsit - self.inceput) < 150:  # eliminam eroarea = sectiune pream mare
                     self.mijlocSectiune = int((self.sfarsit - self.inceput) / 2)
-                    self.centreSectiuni[0][
-                        0] = self.mijlocSectiune  # atribuim centrul calculat sectiunii corespunzatoare
+                    self.centreSectiuni[0][0] = self.mijlocSectiune  # atribuim centrul calculat sectiunii corespunzatoare
                     break
                 else:
                     break
@@ -65,15 +62,14 @@ class Banda:
                 self.sfarsit = i - 1
                 if (self.sfarsit - self.inceput) < 150:  # eliminam eroarea = sectiune pream mare
                     self.mijlocSectiune = int((self.sfarsit - self.inceput) / 2)
-                    self.centreSectiuni[0][
-                        1] = self.mijlocSectiune  # atribuim centrul calculat sectiunii corespunzatoare
+                    self.centreSectiuni[0][1] = self.mijlocSectiune  # atribuim centrul calculat sectiunii corespunzatoare
                     break
                 else:
                     break
 
         incepeSectiunea = 0  # sectiune mijloc stanga
         for i in range(int(0.2 * lungimeCadru), lungimeCadru / 2):
-            if binarization[self.inaltimeSectiuneSus, i] == 1:
+            if binarization[self.inaltimeSectiuneMijloc, i] == 1:
                 if self.incepeSectiunea == 0:
                     self.incepeSectiunea = 1
                     self.inceput = i
@@ -81,15 +77,14 @@ class Banda:
                 self.sfarsit = i - 1
                 if (self.sfarsit - self.inceput) < 150:  # eliminam eroarea = sectiune pream mare v
                     self.mijlocSectiune = int((self.sfarsit - self.inceput) / 2)
-                    self.centreSectiuni[1][
-                        0] = self.mijlocSectiune  # atribuim centrul calculat sectiunii corespunzatoare
+                    self.centreSectiuni[1][0] = self.mijlocSectiune  # atribuim centrul calculat sectiunii corespunzatoare
                     break
                 else:
                     break
 
         self.incepeSectiunea = 0  # sectiune mijloc dreapta
         for i in range(lungimeCadru / 2, int(0.8 * lungimeCadru)):
-            if binarization[self.inaltimeSectiuneSus, i] == 1:
+            if binarization[self.inaltimeSectiuneMijloc, i] == 1:
                 if self.incepeSectiunea == 0:
                     self.incepeSectiunea = 1
                     self.inceput = i
@@ -97,15 +92,14 @@ class Banda:
                 self.sfarsit = i - 1
                 if (self.sfarsit - self.inceput) < 150:  # eliminam eroarea = sectiune pream mare
                     self.mijlocSectiune = int((self.sfarsit - self.inceput) / 2)
-                    self.centreSectiuni[1][
-                        1] = self.mijlocSectiune  # atribuim centrul calculat sectiunii corespunzatoare
+                    self.centreSectiuni[1][1] = self.mijlocSectiune  # atribuim centrul calculat sectiunii corespunzatoare
                     break
                 else:
                     break
 
         self.incepeSectiunea = 0  # sectiune jos stanga
         for i in range(1, lungimeCadru / 2):
-            if binarization[self.inaltimeSectiuneSus, i] == 1:
+            if binarization[self.inaltimeSectiuneJos, i] == 1:
                 if self.incepeSectiunea == 0:
                     self.incepeSectiunea = 1
                     self.inceput = i
@@ -113,15 +107,14 @@ class Banda:
                 self.sfarsit = i - 1
                 if (self.sfarsit - self.inceput) < 150:  # eliminam eroarea = sectiune pream mare
                     self.mijlocSectiune = int((self.sfarsit - self.inceput) / 2)
-                    self.centreSectiuni[2][
-                        0] = self.mijlocSectiune  # atribuim centrul calculat sectiunii corespunzatoare
+                    self.centreSectiuni[2][0] = self.mijlocSectiune  # atribuim centrul calculat sectiunii corespunzatoare
                     break
                 else:
                     break
 
         self.incepeSectiunea = 0  # sectiune jos dreapta
         for i in range(lungimeCadru / 2, lungimeCadru):
-            if binarization[self.inaltimeSectiuneSus, i] == 1:
+            if binarization[self.inaltimeSectiuneJos, i] == 1:
                 if self.incepeSectiunea == 0:
                     self.incepeSectiunea = 1
                     self.inceput = i
@@ -129,8 +122,7 @@ class Banda:
                 self.sfarsit = i - 1
                 if (self.sfarsit - self.inceput) < 150:  # eliminam eroarea = sectiune pream mare
                     self.mijlocSectiune = int((self.sfarsit - self.inceput) / 2)
-                    self.centreSectiuni[2][
-                        1] = self.mijlocSectiune  # atribuim centrul calculat sectiunii corespunzatoare
+                    self.centreSectiuni[2][1] = self.mijlocSectiune  # atribuim centrul calculat sectiunii corespunzatoare
                     break
                 else:
                     break
