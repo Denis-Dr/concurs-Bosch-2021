@@ -1,7 +1,7 @@
 import SerialHandler
 import threading
 import sys
-
+import imutils
 import time
 import cv2
 import numpy as np
@@ -107,9 +107,18 @@ class OneLane:
 
 def PutLines():
     inaltimeCadru, lungimeCadru, _ = frame.shape
-    cv2.line(img, (int(0.1*lungimeCadru), int(inaltimeCadru * 1.0 / 2)), (int(0.9*lungimeCadru), int(inaltimeCadru * 1.0 / 2)), (255, 255, 0), 2)
+    cv2.line(img, (int(0.1*lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.455*lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
+    cv2.line(img, (int(0.555 * lungimeCadru), int(inaltimeCadru * 0.5)),(int(0.9 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
     cv2.line(img, (0, int(inaltimeCadru * 0.65)), (lungimeCadru, int(inaltimeCadru * 0.65)), (255, 255, 0), 2)
     cv2.line(img, (int(lungimeCadru / 2), 0), (int(lungimeCadru / 2), inaltimeCadru), (255, 255, 255), 2) # linia verticala
+
+    cv2.line(binarization, (int(0.1 * lungimeCadru), int(inaltimeCadru * 0.5)),
+             (int(0.455 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
+    cv2.line(binarization, (int(0.555 * lungimeCadru), int(inaltimeCadru * 0.5)),
+             (int(0.9 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
+    cv2.line(binarization, (0, int(inaltimeCadru * 0.65)), (lungimeCadru, int(inaltimeCadru * 0.65)), (255, 255, 0), 2)
+    cv2.line(binarization, (int(lungimeCadru / 2), 0), (int(lungimeCadru / 2), inaltimeCadru), (255, 255, 255),
+             2)  # linia verticala
 
 def calculLatimeBanda(centreSectiuni):
     vectorLatimiBanda = [-1, -1]
@@ -193,7 +202,7 @@ while (cap.isOpened()):
 
     Sectiune = Banda() #initializare benzi.py
 
-    Sectiune.setInaltimeSectiuneSus(int (inaltimeCadru * 1.0 / 2))
+    Sectiune.setInaltimeSectiuneSus(int (inaltimeCadru * 0.5))
     Sectiune.setInaltimeSectiuneJos(int (inaltimeCadru * 0.65))
 
     centreSectiuni = Sectiune.calculCentreSectiuni(binarization, lungimeCadru)
@@ -221,9 +230,10 @@ while (cap.isOpened()):
 #################################################################################################
 
     centreSectiuniCompletat = completareCentre(centreSectiuni, vectorLatimiMedii)
-    vectorCentreMedii = Sectiune.calculCentreMedii(centreSectiuniCompletat)
-    centruRelativ = Sectiune.calculCentruRelativ()
-    distantaFataDeAx = Sectiune.calculDistantaFataDeAx( MijlocCamera)
+    vectorCentreMedii = Sectiune.calculCentreMedii( centreSectiuniCompletat)
+    print("### vectorCentreMedii ", vectorCentreMedii)
+    centruRelativ = Sectiune.calculCentruRelativ( vectorCentreMedii)
+    distantaFataDeAx = Sectiune.calculDistantaFataDeAx( centruRelativ, MijlocCamera)
 
 
 
