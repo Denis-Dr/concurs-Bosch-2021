@@ -17,11 +17,10 @@ VIDEO_RECORD = False
 AMPARCAT=False
 
 ## VARIABILE
-cap = cv2.VideoCapture('cameraG.avi')
+cap = cv2.VideoCapture('cameraE.avi')
 latimeSus = np.zeros(0)
-latimeMijloc = np.zeros(0)
 latimeJos = np.zeros(0)
-vectorLatimiMedii=[-1, -1, -1]
+vectorLatimiMedii=np.array([-1, -1])
 distantaFataDeAx = 0
 centruRelativ = 0
 
@@ -108,17 +107,17 @@ class OneLane:
 
 def PutLines():
     inaltimeCadru, lungimeCadru, _ = frame.shape
-    cv2.line(img, (int(0.25*lungimeCadru), int(inaltimeCadru * 1.0 / 3)), (int(0.75*lungimeCadru), int(inaltimeCadru * 1.0 / 3)), (255, 255, 0), 2)
     cv2.line(img, (int(0.1*lungimeCadru), int(inaltimeCadru * 1.0 / 2)), (int(0.9*lungimeCadru), int(inaltimeCadru * 1.0 / 2)), (255, 255, 0), 2)
     cv2.line(img, (0, int(inaltimeCadru * 2.0 / 3)), (lungimeCadru, int(inaltimeCadru * 2.0 / 3)), (255, 255, 0), 2)
     cv2.line(img, (int(lungimeCadru / 2), 0), (int(lungimeCadru / 2), inaltimeCadru), (255, 255, 255), 2) # linia verticala
 
 def calculLatimeBanda(centreSectiuni):
-    vectorLatimiBanda = [-1, -1, -1]
-    vectorLatimiBanda[0] = int(centreSectiuni[0][1] - centreSectiuni[0][0]) # latime sus
-    vectorLatimiBanda[1] = int(centreSectiuni[1][1] - centreSectiuni[1][0]) # latime mijloc
-    vectorLatimiBanda[2] = int(centreSectiuni[2][1] - centreSectiuni[2][0]) # latime jos
-
+    vectorLatimiBanda = [-1, -1]
+    if centreSectiuni[0][1] != -1 and centreSectiuni[0][0] != -1:
+        vectorLatimiBanda[0] = int(centreSectiuni[0][1] - centreSectiuni[0][0]) # latime sus
+    if centreSectiuni[1][1] != -1 and centreSectiuni[1][0] != -1:
+        vectorLatimiBanda[1] = int(centreSectiuni[1][1] - centreSectiuni[1][0])
+    print("### vectorLatimiBanda", vectorLatimiBanda)
     return vectorLatimiBanda
 
 def completareCentre(centreSectiuni, vectorLatimiMedii): # completeaza centrele nedetectate din matricea centrelor cu ajutorul vectorLatimiBanda
@@ -131,20 +130,13 @@ def completareCentre(centreSectiuni, vectorLatimiMedii): # completeaza centrele 
         centreSectiuniCompletat[0][0] = centreSectiuni[0][0]
         centreSectiuniCompletat[0][1] = centreSectiuni[0][0] + vectorLatimiMedii[0]
 
-    if centreSectiuni[1][0] == -1 and centreSectiuni[1][1] != -1: # completare sectiuni mijloc
+    if centreSectiuni[1][0] == -1 and centreSectiuni[1][1] != -1:
         centreSectiuniCompletat[1][0] = centreSectiuni[1][1] - vectorLatimiMedii[1]
         centreSectiuniCompletat[1][1] = centreSectiuni[1][1]
     elif centreSectiuni[1][0] != -1 and centreSectiuni[1][1] == -1:
         centreSectiuniCompletat[1][0] = centreSectiuni[1][0]
         centreSectiuniCompletat[1][1] = centreSectiuni[1][0] + vectorLatimiMedii[1]
-
-    if centreSectiuni[2][0] == -1 and centreSectiuni[2][1] != -1: # completare sectiuni jos
-        centreSectiuniCompletat[2][0] = centreSectiuni[2][1] - vectorLatimiMedii[2]
-        centreSectiuniCompletat[2][1] = centreSectiuni[2][1]
-    elif centreSectiuni[2][0] != -1 and centreSectiuni[2][1] == -1:
-        centreSectiuniCompletat[2][0] = centreSectiuni[2][0]
-        centreSectiuniCompletat[2][1] = centreSectiuni[2][0] + vectorLatimiMedii[2]
-
+    print("### centreSectiuniCompletat ", centreSectiuniCompletat)
     return centreSectiuniCompletat
 
 
@@ -171,6 +163,7 @@ while (cap.isOpened()):
         cv2.putText(img, "Cadrul: " + str(counter), (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.4,
                     (250, 250, 250), 2)
 
+    print("\n ----------- FRAME ", counter, " --------------")
 
     if EsteStop :
         print("avem stop")
@@ -200,27 +193,32 @@ while (cap.isOpened()):
 
     Sectiune = Banda() #initializare benzi.py
 
-    Sectiune.setInaltimeSectiuneSus(inaltimeCadru * 1.0 / 3)#33.3 % din camera
-    Sectiune.setInaltimeSectiuneMijloc(inaltimeCadru * 1.0 / 2)
-    Sectiune.setInaltimeSectiuneJos(inaltimeCadru * 2.0 / 3)
+    Sectiune.setInaltimeSectiuneSus(int (inaltimeCadru * 1.0 / 2))
+    Sectiune.setInaltimeSectiuneJos(int (inaltimeCadru * 2.0 / 3))
 
     centreSectiuni = Sectiune.calculCentreSectiuni(binarization, lungimeCadru)
 
-    if contorDistMedBenzi < 3: # CALCUL LATIME MEDIE BANDA DUPA 3 CADRE
-        contorDistMedBenzi += 1
+################################################################################################
+####### calc lat medie banda la fiecare 3 cadre cu detectare ################################################
+################################################################################################
+
+    if contorDistMedBenzi < 3: # CALCUL LATIME MEDIE BANDA DUPA 3 CADRE CU BANDA DETECTATA
+
         vectorLatimiBanda = calculLatimeBanda(centreSectiuni) # calcul latimi banda
-        latimeSus = np.append( latimeSus, vectorLatimiBanda[0])
-        latimeMijloc = np.append( latimeMijloc, vectorLatimiBanda[1])
-        latimeJos = np.append( latimeJos, vectorLatimiBanda[2])
+        if vectorLatimiBanda[0] != -1 and vectorLatimiBanda[1] != -1:
+            latimeSus = np.append( latimeSus, vectorLatimiBanda[0])
+            latimeJos = np.append( latimeJos, vectorLatimiBanda[1])
+            contorDistMedBenzi += 1
     else:
         contorDistMedBenzi = 0
         vectorLatimiMedii[0] = int(np.average(latimeSus))
-        vectorLatimiMedii[1] = int(np.average(latimeMijloc))
-        vectorLatimiMedii[2] = int(np.average(latimeJos))
-        print("Dupa 3 cadre latimea medie a benzii este : " + str(vectorLatimiMedii))
+        vectorLatimiMedii[1] = int(np.average(latimeJos))
+        print("--> latimea medie a benzii este : " + str(vectorLatimiMedii))
         latimeSus = np.zeros(0)
-        latimeMijloc = np.zeros(0)
         latimeJos = np.zeros(0)
+    print("### vectorLatimiMedii ", vectorLatimiMedii)
+#################################################################################################
+#################################################################################################
 
     centreSectiuniCompletat = completareCentre(centreSectiuni, vectorLatimiMedii)
     vectorCentreMedii = Sectiune.calculCentreMedii(centreSectiuniCompletat)
