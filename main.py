@@ -108,7 +108,7 @@ class OneLane:
 def PutLines():
     inaltimeCadru, lungimeCadru, _ = frame.shape
     cv2.line(img, (int(0.1*lungimeCadru), int(inaltimeCadru * 1.0 / 2)), (int(0.9*lungimeCadru), int(inaltimeCadru * 1.0 / 2)), (255, 255, 0), 2)
-    cv2.line(img, (0, int(inaltimeCadru * 2.0 / 3)), (lungimeCadru, int(inaltimeCadru * 2.0 / 3)), (255, 255, 0), 2)
+    cv2.line(img, (0, int(inaltimeCadru * 0.65)), (lungimeCadru, int(inaltimeCadru * 0.65)), (255, 255, 0), 2)
     cv2.line(img, (int(lungimeCadru / 2), 0), (int(lungimeCadru / 2), inaltimeCadru), (255, 255, 255), 2) # linia verticala
 
 def calculLatimeBanda(centreSectiuni):
@@ -194,7 +194,7 @@ while (cap.isOpened()):
     Sectiune = Banda() #initializare benzi.py
 
     Sectiune.setInaltimeSectiuneSus(int (inaltimeCadru * 1.0 / 2))
-    Sectiune.setInaltimeSectiuneJos(int (inaltimeCadru * 2.0 / 3))
+    Sectiune.setInaltimeSectiuneJos(int (inaltimeCadru * 0.65))
 
     centreSectiuni = Sectiune.calculCentreSectiuni(binarization, lungimeCadru)
 
