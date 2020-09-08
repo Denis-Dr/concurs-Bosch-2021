@@ -18,9 +18,11 @@ class Banda:
 
     def setInaltimeSectiuneSus(self, valoare):
         self.inaltimeSectiuneSus = int(valoare)
+        return self.inaltimeSectiuneSus
 
     def setInaltimeSectiuneJos(self, valoare):
         self.inaltimeSectiuneJos = int(valoare)
+        return self.inaltimeSectiuneJos
 
     def calculCentreSectiuni(self, binarization, lungimeCadru):  # calculul centrelor celor 6 sectiuni
 
@@ -44,7 +46,7 @@ class Banda:
                     break
 
         self.contorLungime = 0
-        self.incepeSectiunea = 0  # sectiune sus dreaota
+        self.incepeSectiunea = 0  # sectiune sus dreapta
         for i in range(int(lungimeCadru *0.555), int(0.9 * lungimeCadru)):
             if binarization[self.inaltimeSectiuneSus, i] == 255:
                 if self.incepeSectiunea == 0:
@@ -64,14 +66,14 @@ class Banda:
 
         self.contorLungime = 0
         self.incepeSectiunea = 0  # sectiune jos stanga
-        for i in range(1, int(lungimeCadru / 2)):
+        for i in range(1, int(lungimeCadru * 0.5)):
             if binarization[self.inaltimeSectiuneJos, i] == 255:
                 if self.incepeSectiunea == 0:
                     self.incepeSectiunea = 1
                     self.inceput = i
                 self.contorLungime += 1
 
-            if self.incepeSectiunea == 1 and (binarization[self.inaltimeSectiuneSus, i] == 0 or i == (int(lungimeCadru / 2) -1)):
+            if self.incepeSectiunea == 1 and (binarization[self.inaltimeSectiuneJos, i] == 0 or i == (int(lungimeCadru * 0.5) -1)):
                 self.incepeSectiunea == 0
                 self.sfarsit = i-1
                 if self.contorLungime < 150:  # eliminam eroarea = sectiune pream mare
@@ -83,14 +85,14 @@ class Banda:
 
         self.contorLungime = 0
         self.incepeSectiunea = 0  # sectiune jos dreapta
-        for i in range(int(lungimeCadru / 2), lungimeCadru):
+        for i in range(int(lungimeCadru * 0.5), lungimeCadru):
             if binarization[self.inaltimeSectiuneJos, i] == 255:
                 if self.incepeSectiunea == 0:
                     self.incepeSectiunea = 1
                     self.inceput = i
                 self.contorLungime +=1
 
-            if self.incepeSectiunea == 1 and (binarization[self.inaltimeSectiuneSus, i] == 0 or i == (lungimeCadru -1)):
+            if self.incepeSectiunea == 1 and (binarization[self.inaltimeSectiuneJos, i] == 0 or i == (lungimeCadru -1)):
                 self.incepeSectiunea == 0
                 self.sfarsit = i-1
                 if self.contorLungime < 150:  # eliminam eroarea = sectiune pream mare
@@ -99,6 +101,7 @@ class Banda:
                     break
                 else:
                     break
+
         print("### centreSectiuni ", self.centreSectiuni)
         return self.centreSectiuni  # returnam matricea cu centrele sectiunilor
 

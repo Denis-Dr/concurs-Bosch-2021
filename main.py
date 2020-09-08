@@ -48,17 +48,36 @@ class Indicator:
     PARCARE = 2
     Eroare = 3
 
+def deseneazaDrum(centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea, inaltimeSectiuneSus, inaltimeSectiuneJos):
+    if nrBenziDetectate == 2:
+        for j in range(2):
+            if centreSectiuni[0][j] != -1:
+                cv2.putText(img, str(centreSectiuniCompletat[0][j]), (centreSectiuniCompletat[0][j] - 20, inaltimeSectiuneSus - 8), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 210, 0), 2)
+                cv2.circle(img, (centreSectiuniCompletat[0][j], inaltimeSectiuneSus), 3, (0, 0, 200), 3)
+            else:
+                cv2.putText(img, str(centreSectiuniCompletat[0][j]), (centreSectiuniCompletat[0][j] - 20, inaltimeSectiuneSus - 8), cv2.FONT_HERSHEY_SIMPLEX, 1,(0, 30, 200), 2)
+                cv2.circle(img, (centreSectiuniCompletat[0][j], inaltimeSectiuneSus), 3, (200, 0, 0), 3)
+
+        for j in range(2):
+            if centreSectiuni[1][j] != -1:
+                cv2.putText(img, str(centreSectiuniCompletat[1][j]), (centreSectiuniCompletat[1][j] - 20, inaltimeSectiuneJos - 8), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 210, 0), 2)
+                cv2.circle(img, (centreSectiuniCompletat[1][j], inaltimeSectiuneJos), 3, (0, 0, 200), 3)
+            else:
+                cv2.putText(img, str(centreSectiuniCompletat[1][j]), (centreSectiuniCompletat[1][j] - 20, inaltimeSectiuneJos - 8), cv2.FONT_HERSHEY_SIMPLEX, 1,(0, 30, 200), 2)
+                cv2.circle(img, (centreSectiuniCompletat[1][j], inaltimeSectiuneJos), 3, (200, 0, 0), 3)
+
+
+
 
 class TwoLanes:
-    def __init__(self, Sectiune):
-        self.Sectiune = Sectiune
-        self.MedDistanta=0
-    def draw(self):
-        global DiferentaFataDeMijloc
+    def __init__(self):
+        pass
 
-        for centru in self.Sectiune.centreSectiuniCompletat:
+    def draw(self, centreSectiuniCompletat, centruRelativ, distantaFataDeAx, nrBenziDetectate):
+
+        for centru in centreSectiuniCompletat:
             cv2.putText(img, str(centru), (int(centru - 20), int(inaltimeCadru * 2.0 / 3)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
-        self.nrBenzi, self_ = self.Sectiune.nrBenziDetectate()
+        self.nrBenzi, self._ = nrBenziDetectate()
         if self.nrBenzi > 1:
             cv2.arrowedLine(img, (int(lungimeCadru / 2), 300), (int(centruRelativ), 300), (255, 255, 125), 2)
             cv2.putText(img, "Dist: " + str(distantaFataDeAx), (int(lungimeCadru / 2 + 50), 300),
@@ -123,9 +142,10 @@ def PutLines():
 def calculLatimeBanda(centreSectiuni):
     vectorLatimiBanda = [-1, -1]
     if centreSectiuni[0][1] != -1 and centreSectiuni[0][0] != -1:
-        vectorLatimiBanda[0] = int(centreSectiuni[0][1] - centreSectiuni[0][0]) # latime sus
+        vectorLatimiBanda[0] = centreSectiuni[0][1] - centreSectiuni[0][0] # latime sus
+
     if centreSectiuni[1][1] != -1 and centreSectiuni[1][0] != -1:
-        vectorLatimiBanda[1] = int(centreSectiuni[1][1] - centreSectiuni[1][0])
+        vectorLatimiBanda[1] = centreSectiuni[1][1] - centreSectiuni[1][0]
     print("### vectorLatimiBanda", vectorLatimiBanda)
     return vectorLatimiBanda
 
@@ -156,6 +176,7 @@ counterStop=0
 contorDistMedBenzi = 0 # calculam distanda medie intre benzi in primele 3 cade ale videoului
 
 while (cap.isOpened()):
+    t1 = time.time()
     ret, frame = cap.read()
     if ret is False:
         break
@@ -202,14 +223,14 @@ while (cap.isOpened()):
 
     Sectiune = Banda() #initializare benzi.py
 
-    Sectiune.setInaltimeSectiuneSus(int (inaltimeCadru * 0.5))
-    Sectiune.setInaltimeSectiuneJos(int (inaltimeCadru * 0.65))
+    inaltimeSectiuneSus = Sectiune.setInaltimeSectiuneSus(int (inaltimeCadru * 0.5))
+    inaltimeSectiuneJos = Sectiune.setInaltimeSectiuneJos(int (inaltimeCadru * 0.65))
 
     centreSectiuni = Sectiune.calculCentreSectiuni(binarization, lungimeCadru)
 
-################################################################################################
-####### calc lat medie banda la fiecare 3 cadre cu detectare ################################################
-################################################################################################
+#########################################################################################
+####### calc lat medie banda la fiecare 3 cadre cu detectare ############################
+#########################################################################################
 
     if contorDistMedBenzi < 3: # CALCUL LATIME MEDIE BANDA DUPA 3 CADRE CU BANDA DETECTATA
 
@@ -226,8 +247,8 @@ while (cap.isOpened()):
         latimeSus = np.zeros(0)
         latimeJos = np.zeros(0)
     print("### vectorLatimiMedii ", vectorLatimiMedii)
-#################################################################################################
-#################################################################################################
+########################################################################################
+########################################################################################
 
     centreSectiuniCompletat = completareCentre(centreSectiuni, vectorLatimiMedii)
     vectorCentreMedii = Sectiune.calculCentreMedii( centreSectiuniCompletat)
@@ -235,7 +256,7 @@ while (cap.isOpened()):
     centruRelativ = Sectiune.calculCentruRelativ( vectorCentreMedii)
     distantaFataDeAx = Sectiune.calculDistantaFataDeAx( centruRelativ, MijlocCamera)
 
-
+    nrBenziDetectate, partea = Sectiune.nrBenziDetectate()
 
     fps = cap.get(cv2.CAP_PROP_FPS)
 
@@ -259,11 +280,12 @@ while (cap.isOpened()):
     except:
         pass
 
-    nrBenziDetectate, _ = Sectiune.nrBenziDetectate()
-    if nrBenziDetectate == 2:
-        ObiectDrum = TwoLanes(Sectiune)
-    elif nrBenziDetectate == 1:
-        ObiectBanda = OneLane(Sectiune)
+   # nrBenziDetectate, _ = Sectiune.nrBenziDetectate()
+  #  if nrBenziDetectate == 2:
+ #       ObiectDrum = TwoLanes()
+    #    ObiectDrum.draw(centreSectiuniCompletat, centruRelativ, distantaFataDeAx, nrBenziDetectate)
+    #elif nrBenziDetectate == 1:
+    #    ObiectBanda = OneLane(Sectiune)
     else:
         print("Nicio banda detectata!")
 
@@ -319,10 +341,13 @@ while (cap.isOpened()):
     except Exception as e:
         print(e)
         pass
+
+    deseneazaDrum(centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea,
+                  inaltimeSectiuneSus, inaltimeSectiuneJos)
 #DA EROARE AICI:
-   # nrBenziDetectate, _ = Sectiune.nrBenziDetectate()
-   # if nrBenziDetectate == 2:
-     #   ObiectDrum.draw()
+    #nrBenziDetectate, _ = Sectiune.nrBenziDetectate()
+    #if nrBenziDetectate == 2:
+    #    ObiectDrum.draw()
    # elif nrBenziDetectate == 1:
    #     ObiectBanda.draw()
 
@@ -332,11 +357,15 @@ while (cap.isOpened()):
     else :
         print(masina.current_state.value)
 
+    t2 = time.time() - t1
+    print("timp executie", t2, "s")
+
     if (not ESTE_PE_MASINA) :
         cv2.imshow("Image", img)
         cv2.imshow("binarizare", binarization)
         cv2.waitKey(0)  # 1=readare automata // 0=redare la buton
         time.sleep(0.0)
+
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
