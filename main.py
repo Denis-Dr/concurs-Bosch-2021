@@ -16,7 +16,7 @@ VIDEO_RECORD = False
 AMPARCAT=False
 
 ## VARIABILE
-cap = cv2.VideoCapture('cameraE.avi')
+cap = cv2.VideoCapture('cameraC.avi')
 latimeSus = np.zeros(0)
 latimeJos = np.zeros(0)
 vectorLatimiMedii=np.array([-1, -1])
@@ -47,7 +47,7 @@ class Indicator:
     PARCARE = 2
     Eroare = 3
 
-def deseneazaDrum(centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea, inaltimeSectiuneSus, inaltimeSectiuneJos, vectorCentreMedii):
+def deseneazaDrum(centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea, inaltimeSectiuneSus, inaltimeSectiuneJos, vectorCentreMedii, intersectie):
     cv2.putText(img, "Benzi gasite: " + str(nrBenziDetectate), (10, 430), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (140, 140, 210), 2)
 
     if centruRelativ != 0:
@@ -79,7 +79,7 @@ def deseneazaDrum(centreSectiuniCompletat, centreSectiuni, centruRelativ, distan
 
     elif nrBenziDetectate == 1:
         if partea == "stanga":
-            cv2.putText(img, "Detecteaza banda stanga", (380, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 180), 2)
+            cv2.putText(img, "Detecteaza banda stanga", (380, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 190), 2)
             print("Detecteaza banda stanga. Pozitia aprox. a benzii dreapta este: ", centreSectiuniCompletat[0][1], "; ", centreSectiuniCompletat[1][1])
             if centreSectiuniCompletat[0][0] != -1:
                 cv2.putText(img, str(centreSectiuniCompletat[0][0]), (centreSectiuniCompletat[0][0] - 20, inaltimeSectiuneSus - 8), cv2.FONT_HERSHEY_SIMPLEX, 1, (200, 30, 0), 2)
@@ -90,7 +90,7 @@ def deseneazaDrum(centreSectiuniCompletat, centreSectiuni, centruRelativ, distan
                 cv2.circle(img, (centreSectiuniCompletat[1][0], inaltimeSectiuneJos), 3, (0, 200, 0), 3)
 
         elif partea == "dreapta":
-            cv2.putText(img, "Detecteaza banda dreapta", (380, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 180), 2)
+            cv2.putText(img, "Detecteaza banda dreapta", (380, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 190), 2)
             print("Detecteaza banda dreapta. Pozitia aprox. a benzii stanga este: ", centreSectiuniCompletat[0][0], "; ", centreSectiuniCompletat[1][0])
             if centreSectiuniCompletat[0][1] != -1:
                 cv2.putText(img, str(centreSectiuniCompletat[0][1]), (centreSectiuniCompletat[0][1] - 20, inaltimeSectiuneSus - 8), cv2.FONT_HERSHEY_SIMPLEX, 1, (200, 30, 0), 2)
@@ -101,6 +101,9 @@ def deseneazaDrum(centreSectiuniCompletat, centreSectiuni, centruRelativ, distan
                 cv2.circle(img, (centreSectiuniCompletat[1][1], inaltimeSectiuneJos), 3, (0, 200, 0), 3)
     else:
         print("Nicio banda detectata!!!")
+
+    if intersectie == 1:
+        cv2.putText(img, "URMEAZA INTERSECTIE", (360, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 90, 255), 2)
 #########
 #########
 class TwoLanes:
@@ -161,18 +164,22 @@ class OneLane:
 def PutLines():
     inaltimeCadru, lungimeCadru, _ = frame.shape
 
-    cv2.line(img, (int(0.08*lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.47*lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
-    cv2.line(img, (int(0.53 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.92 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
+    cv2.line(img, (int(0.08*lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.46*lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
+    cv2.line(img, (int(0.54 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.92 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
 
     cv2.line(img, (0, int(inaltimeCadru * 0.65)), (lungimeCadru, int(inaltimeCadru * 0.65)), (255, 255, 0), 2)
 
     cv2.line(img, (int(lungimeCadru / 2), 0), (int(lungimeCadru / 2), inaltimeCadru), (255, 255, 255), 2) # linia verticala
 
-    cv2.line(binarization, (int(0.08 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.47 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
-    cv2.line(binarization, (int(0.53 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.92 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
+    cv2.line(binarization, (int(0.08 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.46 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
+    cv2.line(binarization, (int(0.54 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.92 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
 
     cv2.line(binarization, (0, int(inaltimeCadru * 0.65)), (lungimeCadru, int(inaltimeCadru * 0.65)), (255, 255, 0), 2)
     cv2.line(binarization, (int(lungimeCadru / 2), 0), (int(lungimeCadru / 2), inaltimeCadru), (255, 255, 255), 2)  # linia verticala
+
+    cv2.line(img, (int(0.33*lungimeCadru), inaltimeSectiuneSus), (int(0.33*lungimeCadru), inaltimeSectiuneJos), (255, 0, 255), 2)
+    cv2.line(img, (int(0.5 * lungimeCadru), inaltimeSectiuneSus), (int(0.5 * lungimeCadru), inaltimeSectiuneJos), (255, 0, 255), 2)
+    cv2.line(img, (int(0.67 * lungimeCadru), inaltimeSectiuneSus), (int(0.67 * lungimeCadru), inaltimeSectiuneJos), (255, 0, 255), 2)
 
 def calculLatimeBanda(centreSectiuni):
     vectorLatimiBanda = [-1, -1]
@@ -251,7 +258,7 @@ while (cap.isOpened()):
 
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    ret, binarization = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY)
+    ret, binarization = cv2.threshold(gray, 190, 255, cv2.THRESH_BINARY)
 
     inaltimeCadru, lungimeCadru, _ = frame.shape # H si L imagine
     MijlocCamera = int(lungimeCadru / 2.0)
@@ -271,8 +278,8 @@ while (cap.isOpened()):
 
         vectorLatimiBanda = calculLatimeBanda(centreSectiuni) # calcul latimi banda
 
-        if ((exceptieDeInceput > 0 or ((vectorLatimiMedii[0]-20 < vectorLatimiBanda[0] < vectorLatimiMedii[0]+20) and
-                    vectorLatimiMedii[1]-20 < vectorLatimiBanda[1] < vectorLatimiMedii[1]+20)) and (vectorLatimiBanda[0] != -1 and vectorLatimiBanda[1] != -1)):
+        if ((exceptieDeInceput > 0 or ((vectorLatimiMedii[0]-15 < vectorLatimiBanda[0] < vectorLatimiMedii[0]+15) and
+                    vectorLatimiMedii[1]-15 < vectorLatimiBanda[1] < vectorLatimiMedii[1]+15)) and (vectorLatimiBanda[0] != -1 and vectorLatimiBanda[1] != -1)):
 
             latimeSus = np.append( latimeSus, vectorLatimiBanda[0])
             latimeJos = np.append( latimeJos, vectorLatimiBanda[1])
@@ -298,6 +305,10 @@ while (cap.isOpened()):
 
     nrBenziDetectate, partea = Sectiune.nrBenziDetectate()
 
+    intersectie = Sectiune.detectareIntersectie(binarization, lungimeCadru)
+    if intersectie == 1:
+        print("--> Urmeaza INTERSECTIE")
+
     fps = cap.get(cv2.CAP_PROP_FPS)
 
 
@@ -315,10 +326,10 @@ while (cap.isOpened()):
     #except:
     #    pass
 
-    try:
-        del ObiectBanda
-    except:
-        pass
+    #try:
+    #    del ObiectBanda
+    #except:
+     #   pass
 
    # nrBenziDetectate, _ = Sectiune.nrBenziDetectate()
   #  if nrBenziDetectate == 2:
@@ -382,8 +393,9 @@ while (cap.isOpened()):
         print(e)
         pass
 
-    deseneazaDrum(centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea,
-                  inaltimeSectiuneSus, inaltimeSectiuneJos, vectorCentreMedii)
+    if (not ESTE_PE_MASINA):
+        deseneazaDrum(centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea,
+                  inaltimeSectiuneSus, inaltimeSectiuneJos, vectorCentreMedii, intersectie)
 #DA EROARE AICI:
     #nrBenziDetectate, _ = Sectiune.nrBenziDetectate()
     #if nrBenziDetectate == 2:

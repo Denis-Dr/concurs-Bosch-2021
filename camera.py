@@ -68,6 +68,7 @@ cap = cv2.VideoCapture("cameraE.avi")
 while (cap.isOpened()):
     check, frame = cap.read()
 
+
     canny_image = canny_edge_detector(frame)
     cropped_image = region_of_interest(canny_image)
 
@@ -78,6 +79,8 @@ while (cap.isOpened()):
     averaged_lines = average_slope_intercept(frame, lines)
     line_image = display_lines(frame, averaged_lines)
     combo_image = cv2.addWeighted(frame, 0.8, line_image, 1, 1)
+
+    cv2.imshow("hsv", imagineHSV)
 
     cv2.namedWindow("results", cv2.WINDOW_NORMAL)
     cv2.imshow("results", combo_image)
