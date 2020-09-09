@@ -28,7 +28,7 @@ class Banda:
 
         self.contorLungime = 0
         self.incepeSectiunea = 0  # sectiune sus stanga
-        for i in range(int(0.1*lungimeCadru), int(lungimeCadru *0.455)):
+        for i in range(int(0.1*lungimeCadru), int(lungimeCadru *0.46)):
             if binarization[self.inaltimeSectiuneSus, i] == 255:
                 if self.incepeSectiunea == 0:
                     self.incepeSectiunea = 1
@@ -47,7 +47,7 @@ class Banda:
 
         self.contorLungime = 0
         self.incepeSectiunea = 0  # sectiune sus dreapta
-        for i in range(int(lungimeCadru *0.555), int(0.9 * lungimeCadru)):
+        for i in range(int(lungimeCadru *0.54), int(0.9 * lungimeCadru)):
             if binarization[self.inaltimeSectiuneSus, i] == 255:
                 if self.incepeSectiunea == 0:
                     self.incepeSectiunea = 1
