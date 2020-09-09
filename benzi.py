@@ -2,7 +2,7 @@ import numpy as np
 ''' 
     Modulul detecteaza benzile prin intermediul a 6 sectini si calculeaza centrele pentru fiecare + centrul relativ al benzii (!de implementat).
     Functia calculCentreSectiuni() primeste imaginea binarizata (treshold) si lungimea cadrului (orizontala) si returneaza o 
-matrice 3x2 cu abscisele centrelor. Inaltimile centrelor sunt prestabilite in fisierul principal.
+matrice 2x2 cu abscisele centrelor. Inaltimile centrelor sunt prestabilite in fisierul principal.
     Matricea furnizeaza doua informatii: centrele si ne spune daca se detecteaaza banda (elemente != -1).
 '''
 

@@ -9,7 +9,6 @@ from benzi import Banda
 from Observer import DeplasareMasina
 from StopAndPark import stopOrPark
 
-
 global serialHandler
 DEBUG_ALL_DATA = False
 ESTE_PE_MASINA = False
