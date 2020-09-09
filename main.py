@@ -23,7 +23,7 @@ latimeJos = np.zeros(0)
 vectorLatimiMedii=np.array([-1, -1])
 distantaFataDeAx = 0
 centruRelativ = 0
-
+exceptieDeInceput = 3 # exceptam primele 3 cadre de la regula de calcul a vectorLatimiMedii pt a obt o latime media reala pe care sa incercam sa o pastram
 
 #CentruImaginar = 0
 EroareCentrare = 30
@@ -162,19 +162,18 @@ class OneLane:
 def PutLines():
     inaltimeCadru, lungimeCadru, _ = frame.shape
 
-    cv2.line(img, (int(0.1*lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.46*lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
-    cv2.line(img, (int(0.54 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.9 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
+    cv2.line(img, (int(0.08*lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.47*lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
+    cv2.line(img, (int(0.53 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.92 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
 
     cv2.line(img, (0, int(inaltimeCadru * 0.65)), (lungimeCadru, int(inaltimeCadru * 0.65)), (255, 255, 0), 2)
 
     cv2.line(img, (int(lungimeCadru / 2), 0), (int(lungimeCadru / 2), inaltimeCadru), (255, 255, 255), 2) # linia verticala
 
-    cv2.line(binarization, (int(0.1 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.46 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
-    cv2.line(binarization, (int(0.54 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.9 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
+    cv2.line(binarization, (int(0.08 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.47 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
+    cv2.line(binarization, (int(0.53 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.92 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
 
     cv2.line(binarization, (0, int(inaltimeCadru * 0.65)), (lungimeCadru, int(inaltimeCadru * 0.65)), (255, 255, 0), 2)
-    cv2.line(binarization, (int(lungimeCadru / 2), 0), (int(lungimeCadru / 2), inaltimeCadru), (255, 255, 255),
-             2)  # linia verticala
+    cv2.line(binarization, (int(lungimeCadru / 2), 0), (int(lungimeCadru / 2), inaltimeCadru), (255, 255, 255), 2)  # linia verticala
 
 def calculLatimeBanda(centreSectiuni):
     vectorLatimiBanda = [-1, -1]
@@ -210,7 +209,7 @@ def completareCentre(centreSectiuni, vectorLatimiMedii): # completeaza centrele 
 
 
 counterStop=0
-contorDistMedBenzi = 0 # calculam distanda medie intre benzi in primele 3 cade ale videoului
+contorDistMedBenzi = 0 # calculam distanda medie intre benzi in primele 3 cadre ale videoului
 
 while (cap.isOpened()):
     t1 = time.time()
@@ -253,7 +252,7 @@ while (cap.isOpened()):
 
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    ret, binarization = cv2.threshold(gray, 190, 255, cv2.THRESH_BINARY)
+    ret, binarization = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY)
 
     inaltimeCadru, lungimeCadru, _ = frame.shape # H si L imagine
     MijlocCamera = int(lungimeCadru / 2.0)
@@ -272,10 +271,15 @@ while (cap.isOpened()):
     if contorDistMedBenzi < 3: # CALCUL LATIME MEDIE BANDA DUPA 3 CADRE CU BANDA DETECTATA
 
         vectorLatimiBanda = calculLatimeBanda(centreSectiuni) # calcul latimi banda
-        if vectorLatimiBanda[0] != -1 and vectorLatimiBanda[1] != -1:
+
+        if ((exceptieDeInceput > 0 or ((vectorLatimiMedii[0]-20 < vectorLatimiBanda[0] < vectorLatimiMedii[0]+20) and
+                    vectorLatimiMedii[1]-20 < vectorLatimiBanda[1] < vectorLatimiMedii[1]+20)) and (vectorLatimiBanda[0] != -1 and vectorLatimiBanda[1] != -1)):
+
             latimeSus = np.append( latimeSus, vectorLatimiBanda[0])
             latimeJos = np.append( latimeJos, vectorLatimiBanda[1])
             contorDistMedBenzi += 1
+            if exceptieDeInceput > 0:
+                exceptieDeInceput -= 1
     else:
         contorDistMedBenzi = 0
         vectorLatimiMedii[0] = int(np.average(latimeSus))
@@ -307,10 +311,10 @@ while (cap.isOpened()):
     if not ESTE_PE_MASINA:
         PutLines()
 
-    try:
-        del ObiectDrum
-    except:
-        pass
+    #try:
+    #    del ObiectDrum
+    #except:
+    #    pass
 
     try:
         del ObiectBanda

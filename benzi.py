@@ -28,17 +28,17 @@ class Banda:
 
         self.contorLungime = 0
         self.incepeSectiunea = 0  # sectiune sus stanga
-        for i in range(int(0.1*lungimeCadru), int(lungimeCadru *0.46)):
+        for i in range(int(0.08*lungimeCadru), int(lungimeCadru *0.47)):
             if binarization[self.inaltimeSectiuneSus, i] == 255:
                 if self.incepeSectiunea == 0:
                     self.incepeSectiunea = 1
                     self.inceput = i
                 self.contorLungime += 1
 
-            if self.incepeSectiunea == 1 and (binarization[self.inaltimeSectiuneSus, i] == 0 or i == (int(lungimeCadru *0.455) -1) ):
+            if self.incepeSectiunea == 1 and (binarization[self.inaltimeSectiuneSus, i] == 0 or i == (int(lungimeCadru *0.47) -1) ):
                 self.incepeSectiunea == 0
                 self.sfarsit = i-1
-                if self.contorLungime < 150:  # eliminam eroarea = sectiune pream mare
+                if self.contorLungime < 100:  # eliminam eroarea = sectiune pream mare
                     self.mijlocSectiune = int((self.sfarsit + self.inceput) / 2)
                     self.centreSectiuni[0][0] = self.mijlocSectiune  # atribuim centrul calculat sectiunii corespunzatoare
                     break
@@ -47,17 +47,17 @@ class Banda:
 
         self.contorLungime = 0
         self.incepeSectiunea = 0  # sectiune sus dreapta
-        for i in range(int(lungimeCadru *0.54), int(0.9 * lungimeCadru)):
+        for i in range(int(0.92 * lungimeCadru), int(lungimeCadru *0.53), -1):
             if binarization[self.inaltimeSectiuneSus, i] == 255:
                 if self.incepeSectiunea == 0:
                     self.incepeSectiunea = 1
                     self.inceput = i
                 self.contorLungime += 1
 
-            if self.incepeSectiunea == 1 and (binarization[self.inaltimeSectiuneSus, i] == 0 or i == (int(0.9 * lungimeCadru) -1)):
+            if self.incepeSectiunea == 1 and (binarization[self.inaltimeSectiuneSus, i] == 0 or i == (int(lungimeCadru *0.53) +1)):
                 self.incepeSectiunea == 0
-                self.sfarsit = i-1
-                if self.contorLungime < 150:  # eliminam eroarea = sectiune pream mare
+                self.sfarsit = i+1
+                if self.contorLungime < 100:  # eliminam eroarea = sectiune pream mare
                     self.mijlocSectiune = int((self.sfarsit + self.inceput) / 2)
                     self.centreSectiuni[0][1] = self.mijlocSectiune  # atribuim centrul calculat sectiunii corespunzatoare
                     break
@@ -76,7 +76,7 @@ class Banda:
             if self.incepeSectiunea == 1 and (binarization[self.inaltimeSectiuneJos, i] == 0 or i == (int(lungimeCadru * 0.5) -1)):
                 self.incepeSectiunea == 0
                 self.sfarsit = i-1
-                if self.contorLungime < 150:  # eliminam eroarea = sectiune pream mare
+                if self.contorLungime < 100:  # eliminam eroarea = sectiune pream mare
                     self.mijlocSectiune = int((self.sfarsit + self.inceput) / 2)
                     self.centreSectiuni[1][0] = self.mijlocSectiune  # atribuim centrul calculat sectiunii corespunzatoare
                     break
@@ -85,22 +85,28 @@ class Banda:
 
         self.contorLungime = 0
         self.incepeSectiunea = 0  # sectiune jos dreapta
-        for i in range(int(lungimeCadru * 0.5), lungimeCadru):
+        for i in range(lungimeCadru-1, int(lungimeCadru * 0.5), -1):
             if binarization[self.inaltimeSectiuneJos, i] == 255:
                 if self.incepeSectiunea == 0:
                     self.incepeSectiunea = 1
                     self.inceput = i
                 self.contorLungime +=1
 
-            if self.incepeSectiunea == 1 and (binarization[self.inaltimeSectiuneJos, i] == 0 or i == (lungimeCadru -1)):
+            if self.incepeSectiunea == 1 and (binarization[self.inaltimeSectiuneJos, i] == 0 or i == (int(lungimeCadru * 0.5) +1)):
                 self.incepeSectiunea == 0
-                self.sfarsit = i-1
-                if self.contorLungime < 150:  # eliminam eroarea = sectiune pream mare
+                self.sfarsit = i+1
+                if self.contorLungime < 100:  # eliminam eroarea = sectiune pream mare
                     self.mijlocSectiune = int((self.sfarsit + self.inceput) / 2)
                     self.centreSectiuni[1][1] = self.mijlocSectiune  # atribuim centrul calculat sectiunii corespunzatoare
                     break
                 else:
                     break
+        if (self.centreSectiuni[1][0] != -1 and self.centreSectiuni[0][1] != -1 and self.centreSectiuni[0][0] == -1
+                                        and self.centreSectiuni[1][1] == -1):
+            self.centreSectiuni[0][1] = -1
+        elif (self.centreSectiuni[1][1] != -1 and self.centreSectiuni[0][0] != -1 and self.centreSectiuni[0][1] == -1
+                                        and self.centreSectiuni[1][0] == -1):
+            self.centreSectiuni[0][0] = -1
 
         print("### centreSectiuni ", self.centreSectiuni)
         return self.centreSectiuni  # returnam matricea cu centrele sectiunilor
