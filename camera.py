@@ -68,6 +68,35 @@ cap = cv2.VideoCapture("cameraE.avi")
 while (cap.isOpened()):
     check, frame = cap.read()
 
+    frame2=cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+
+    rows = frame.shape[0]
+    cols = frame.shape[1]
+
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV);
+
+    for i in range(0, cols):
+        for j in range(0, rows):
+            hsv[j, i][1] = 255;
+
+
+    frame3 = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB);
+
+    cv2.imshow("Frame", frame3)
+
+
+    _,th=cv2.threshold(frame2,190,255,cv2.THRESH_BINARY)
+    r, g, b = cv2.split(frame)
+    _, tb=cv2.threshold(b, 190, 255, cv2.THRESH_BINARY)
+    _, tg = cv2.threshold(g, 190, 255, cv2.THRESH_BINARY)
+    _,tr = cv2.threshold(r, 190, 255, cv2.THRESH_BINARY)
+
+
+    input = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    points1 = np.float32([[210, 100], [430, 100], [0, 260], [640, 260]])
+    points2 = np.float32([[0, 0], [640, 0], [0, 480], [640, 480]])
+    P = cv2.getPerspectiveTransform(points1, points2)
+    output = cv2.warpPerspective(input, P, (640, 480))
 
     canny_image = canny_edge_detector(frame)
     cropped_image = region_of_interest(canny_image)
@@ -80,15 +109,19 @@ while (cap.isOpened()):
     line_image = display_lines(frame, averaged_lines)
     combo_image = cv2.addWeighted(frame, 0.8, line_image, 1, 1)
 
-    cv2.imshow("hsv", imagineHSV)
+    #cv2.imshow("output", output)
+    cv2.imshow("b", tb)
+    cv2.imshow("g", tg)
+    cv2.imshow("r", tr)
+    cv2.imshow("TH", th)
 
-    cv2.namedWindow("results", cv2.WINDOW_NORMAL)
-    cv2.imshow("results", combo_image)
-    cv2.resizeWindow("results", 768, 432)
+    #cv2.namedWindow("results", cv2.WINDOW_NORMAL)
+    #cv2.imshow("results", combo_image)
+    #cv2.resizeWindow("results", 768, 432)
 
-    cv2.namedWindow("roi", cv2.WINDOW_NORMAL)
-    cv2.imshow("roi", cropped_image)
-    cv2.resizeWindow("roi", 768, 432)
+    #cv2.namedWindow("roi", cv2.WINDOW_NORMAL)
+   # cv2.imshow("roi", cropped_image)
+    #cv2.resizeWindow("roi", 768, 432)
 
     cv2.waitKey(0)  # 1=readare automata // 0=redare la buton
     if cv2.waitKey(1) & 0xFF == ord('q'):

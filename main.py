@@ -16,18 +16,19 @@ VIDEO_RECORD = False
 AMPARCAT=False
 
 ## VARIABILE
-cap = cv2.VideoCapture('cameraC.avi')
+cap = cv2.VideoCapture('cameraE.avi')
 latimeSus = np.zeros(0)
 latimeJos = np.zeros(0)
 vectorLatimiMedii=np.array([-1, -1])
 distantaFataDeAx = 0
 centruRelativ = 0
-exceptieDeInceput = 3 # exceptam primele 3 cadre de la regula de calcul a vectorLatimiMedii pt a obt o latime media reala pe care sa incercam sa o pastram
+exceptieDeInceput0 = 3 # exceptam primele 3 cadre de la regula de calcul a vectorLatimiMedii pt a obt o latime media reala pe care sa incercam sa o pastram
+exceptieDeInceput1 = 3
 
-#CentruImaginar = 0
+
+
 EroareCentrare = 30
-#DistanteBenzi = np.zeros(0)
-#mijlocCalculat=0
+
 pasAdaptare = 0
 pozitieMijlocAnterior = -1
 counter = 0
@@ -38,7 +39,7 @@ masina = DeplasareMasina()
 
 if VIDEO_RECORD:
     fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-    out = cv2.VideoWriter('cameraJ.avi', fourcc, 20,(640, 480))
+    out = cv2.VideoWriter('cameraG.avi', fourcc, 20,(640, 480))
 
 
 
@@ -104,75 +105,21 @@ def deseneazaDrum(centreSectiuniCompletat, centreSectiuni, centruRelativ, distan
 
     if intersectie == 1:
         cv2.putText(img, "URMEAZA INTERSECTIE", (360, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 90, 255), 2)
-#########
-#########
-class TwoLanes:
-    def __init__(self):
-        pass
-
-    def draw(self, centreSectiuniCompletat, centruRelativ, distantaFataDeAx, nrBenziDetectate):
-
-        for centru in centreSectiuniCompletat:
-            cv2.putText(img, str(centru), (int(centru - 20), int(inaltimeCadru * 2.0 / 3)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
-        self.nrBenzi, self._ = nrBenziDetectate()
-        if self.nrBenzi > 1:
-            cv2.arrowedLine(img, (int(lungimeCadru / 2), 300), (int(centruRelativ), 300), (255, 255, 125), 2)
-            cv2.putText(img, "Dist: " + str(distantaFataDeAx), (int(lungimeCadru / 2 + 50), 300), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (60, 0, 60), 1)
-            cv2.line(img, (int(centruRelativ), 0), (int(centruRelativ), inaltimeCadru), (255, 125, 125), 5)
 
 
 
-class OneLane:
-    def __init__(self, Sectiune):
-        self.Sectiune = Sectiune
-        self.CentruImaginar = 0
-        self.Referinta = 0
-        global MedDistanta
-        if 'MedDistanta' not in globals():
-            MedDistanta=350
-
-        #if self.Sectiune.centre.size == 1:  # cazul in care nu ai 2 benzi
-        self.nrBenzi, self.partea = Sectiune.nrBenziDetectate()
-        if self.nrBenzi == 1:
-            if self.partea == "stanga":
-                #self.Referinta = self.Sectiune.centre[0]
-                #self.CentruImaginar = self.Referinta + (MedDistanta / 2)
-
-                print("Avem o banda pe stanga")
-                #print("Nu exista banda pe partea dreapta, pozitia ei aproximata este " + str(self.CentruImaginar))
-                #cv2.putText(img, "Pozitie Relativa Mijloc Imaginar: " + str(self.CentruImaginar), (10, 420),cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
-            else:
-                #self.Referinta = self.Sectiune.centre[0]
-                #self.CentruImaginar = self.Referinta - (MedDistanta / 2)
-                print("Avem o banda pe dreapta")
-                #print("Nu exista banda pe partea stanga, pozitia ei aproximata este " + str(self.CentruImaginar))
-                #cv2.putText(img, "Pozitie Relativa Mijloc Imaginar: " + str(self.CentruImaginar), (10, 420),cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
-
-        #for centru in self.Sectiune.centre:
-            #    cv2.putText(img, str(centru), (int(centru - 20), int(LatimeCadru * 2.0 / 3)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-
-    def draw(self):
-        global MijlocCamera
-        if self.Sectiune.nrBenziDetectate == 1:  # cazul in care nu ai 2 benzi
-            cv2.line(img, (int(centruRelativ), 0), (int(centruRelativ), inaltimeCadru), (125, 125, 0), 5)
-            cv2.arrowedLine(img, (int(lungimeCadru / 2), 300), (int(centruRelativ), 300), (255, 255, 125), 2)
-            cv2.putText(img, "Avem Mijloc Imaginar", (10, 440), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
-            cv2.putText(img, "Dist: " + str(abs(int(MijlocCamera - centruRelativ))), (int(lungimeCadru / 2 + 50), 300),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (60, 0, 60), 1)
-#######
-#######
 def PutLines():
     inaltimeCadru, lungimeCadru, _ = frame.shape
 
-    cv2.line(img, (int(0.08*lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.46*lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
-    cv2.line(img, (int(0.54 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.92 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
+    cv2.line(img, (int(0.02*lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.46*lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
+    cv2.line(img, (int(0.54 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.98 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
 
     cv2.line(img, (0, int(inaltimeCadru * 0.65)), (lungimeCadru, int(inaltimeCadru * 0.65)), (255, 255, 0), 2)
 
     cv2.line(img, (int(lungimeCadru / 2), 0), (int(lungimeCadru / 2), inaltimeCadru), (255, 255, 255), 2) # linia verticala
 
-    cv2.line(binarization, (int(0.08 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.46 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
-    cv2.line(binarization, (int(0.54 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.92 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
+    cv2.line(binarization, (int(0.02 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.46 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
+    cv2.line(binarization, (int(0.54 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.98 * lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
 
     cv2.line(binarization, (0, int(inaltimeCadru * 0.65)), (lungimeCadru, int(inaltimeCadru * 0.65)), (255, 255, 0), 2)
     cv2.line(binarization, (int(lungimeCadru / 2), 0), (int(lungimeCadru / 2), inaltimeCadru), (255, 255, 255), 2)  # linia verticala
@@ -180,6 +127,7 @@ def PutLines():
     cv2.line(img, (int(0.33*lungimeCadru), inaltimeSectiuneSus), (int(0.33*lungimeCadru), inaltimeSectiuneJos), (255, 0, 255), 2)
     cv2.line(img, (int(0.5 * lungimeCadru), inaltimeSectiuneSus), (int(0.5 * lungimeCadru), inaltimeSectiuneJos), (255, 0, 255), 2)
     cv2.line(img, (int(0.67 * lungimeCadru), inaltimeSectiuneSus), (int(0.67 * lungimeCadru), inaltimeSectiuneJos), (255, 0, 255), 2)
+
 
 def calculLatimeBanda(centreSectiuni):
     vectorLatimiBanda = [-1, -1]
@@ -194,19 +142,21 @@ def calculLatimeBanda(centreSectiuni):
 def completareCentre(centreSectiuni, vectorLatimiMedii): # completeaza centrele nedetectate din matricea centrelor cu ajutorul vectorLatimiBanda
     centreSectiuniCompletat = np.copy(centreSectiuni)
 
-    if centreSectiuni[0][0] == -1 and centreSectiuni[0][1] != -1: # completare sectiuni sus
-        centreSectiuniCompletat[0][0] = centreSectiuni[0][1] - vectorLatimiMedii[0]
-        centreSectiuniCompletat[0][1] = centreSectiuni[0][1]
-    elif centreSectiuni[0][0] != -1 and centreSectiuni[0][1] == -1:
-        centreSectiuniCompletat[0][0] = centreSectiuni[0][0]
-        centreSectiuniCompletat[0][1] = centreSectiuni[0][0] + vectorLatimiMedii[0]
+    if vectorLatimiMedii[0] != -1:
+        if centreSectiuni[0][0] == -1 and centreSectiuni[0][1] != -1: # completare sectiuni sus
+            centreSectiuniCompletat[0][0] = centreSectiuni[0][1] - vectorLatimiMedii[0]
+            centreSectiuniCompletat[0][1] = centreSectiuni[0][1]
+        elif centreSectiuni[0][0] != -1 and centreSectiuni[0][1] == -1:
+            centreSectiuniCompletat[0][0] = centreSectiuni[0][0]
+            centreSectiuniCompletat[0][1] = centreSectiuni[0][0] + vectorLatimiMedii[0]
 
-    if centreSectiuni[1][0] == -1 and centreSectiuni[1][1] != -1:
-        centreSectiuniCompletat[1][0] = centreSectiuni[1][1] - vectorLatimiMedii[1]
-        centreSectiuniCompletat[1][1] = centreSectiuni[1][1]
-    elif centreSectiuni[1][0] != -1 and centreSectiuni[1][1] == -1:
-        centreSectiuniCompletat[1][0] = centreSectiuni[1][0]
-        centreSectiuniCompletat[1][1] = centreSectiuni[1][0] + vectorLatimiMedii[1]
+    if vectorLatimiMedii[1] != -1:
+        if centreSectiuni[1][0] == -1 and centreSectiuni[1][1] != -1: # sectiune jos
+            centreSectiuniCompletat[1][0] = centreSectiuni[1][1] - vectorLatimiMedii[1]
+            centreSectiuniCompletat[1][1] = centreSectiuni[1][1]
+        elif centreSectiuni[1][0] != -1 and centreSectiuni[1][1] == -1:
+            centreSectiuniCompletat[1][0] = centreSectiuni[1][0]
+            centreSectiuniCompletat[1][1] = centreSectiuni[1][0] + vectorLatimiMedii[1]
     print("### centreSectiuniCompletat ", centreSectiuniCompletat)
     return centreSectiuniCompletat
 
@@ -215,7 +165,8 @@ def completareCentre(centreSectiuni, vectorLatimiMedii): # completeaza centrele 
 
 
 counterStop=0
-contorDistMedBenzi = 0 # calculam distanda medie intre benzi in primele 3 cadre ale videoului
+contorDistMedBenzi0 = 0 # calculam distanda medie intre benzi in primele 3 cadre ale videoului
+contorDistMedBenzi1 = 0
 
 while (cap.isOpened()):
     t1 = time.time()
@@ -233,7 +184,7 @@ while (cap.isOpened()):
         out.write(frame)
     if not ESTE_PE_MASINA:
         cv2.putText(img, "Cadrul: " + str(counter), (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.4,
-                    (250, 250, 250), 2)
+                    (200, 200, 250), 2)
 
     print("\n ----------- FRAME ", counter, " --------------")
 
@@ -258,7 +209,8 @@ while (cap.isOpened()):
 
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    ret, binarization = cv2.threshold(gray, 190, 255, cv2.THRESH_BINARY)
+    gray = cv2.GaussianBlur(gray, (5, 5), 0)
+    ret, binarization = cv2.threshold(gray, 192, 255, cv2.THRESH_BINARY)
 
     inaltimeCadru, lungimeCadru, _ = frame.shape # H si L imagine
     MijlocCamera = int(lungimeCadru / 2.0)
@@ -273,25 +225,27 @@ while (cap.isOpened()):
 #########################################################################################
 ####### calc lat medie banda la fiecare 3 cadre cu detectare ############################
 #########################################################################################
-
-    if contorDistMedBenzi < 3: # CALCUL LATIME MEDIE BANDA DUPA 3 CADRE CU BANDA DETECTATA
-
-        vectorLatimiBanda = calculLatimeBanda(centreSectiuni) # calcul latimi banda
-
-        if ((exceptieDeInceput > 0 or ((vectorLatimiMedii[0]-15 < vectorLatimiBanda[0] < vectorLatimiMedii[0]+15) and
-                    vectorLatimiMedii[1]-15 < vectorLatimiBanda[1] < vectorLatimiMedii[1]+15)) and (vectorLatimiBanda[0] != -1 and vectorLatimiBanda[1] != -1)):
-
-            latimeSus = np.append( latimeSus, vectorLatimiBanda[0])
-            latimeJos = np.append( latimeJos, vectorLatimiBanda[1])
-            contorDistMedBenzi += 1
-            if exceptieDeInceput > 0:
-                exceptieDeInceput -= 1
-    else:
-        contorDistMedBenzi = 0
+    vectorLatimiBanda = calculLatimeBanda(centreSectiuni)  # calcul latimi banda
+    if contorDistMedBenzi0 <= 3:  # CALCUL LATIME MEDIE BANDA DUPA 3 CADRE CU BANDA DETECTATA
+        if ((exceptieDeInceput0 > 0 or (vectorLatimiMedii[0] - 35 < vectorLatimiBanda[0] < vectorLatimiMedii[0] + 35)) and vectorLatimiBanda[0] != -1):
+            latimeSus = np.append(latimeSus, vectorLatimiBanda[0])
+            contorDistMedBenzi0 += 1
+            if exceptieDeInceput0 > 0:
+                exceptieDeInceput0 -= 1
+    if contorDistMedBenzi0 == 3:
+        contorDistMedBenzi0 = 0
         vectorLatimiMedii[0] = int(np.average(latimeSus))
-        vectorLatimiMedii[1] = int(np.average(latimeJos))
-        print("--> latimea medie a benzii este : " + str(vectorLatimiMedii))
         latimeSus = np.zeros(0)
+
+    if contorDistMedBenzi1 <= 3:  # CALCUL LATIME MEDIE BANDA DUPA 3 CADRE CU BANDA DETECTATA
+        if ((exceptieDeInceput1 > 0 or (vectorLatimiMedii[1] - 35 < vectorLatimiBanda[1] < vectorLatimiMedii[1] + 35)) and vectorLatimiBanda[1] != -1):
+            latimeJos = np.append(latimeJos, vectorLatimiBanda[1])
+            contorDistMedBenzi1 += 1
+            if exceptieDeInceput1 > 0:
+                exceptieDeInceput1 -= 1
+    if contorDistMedBenzi1 == 3:
+        contorDistMedBenzi1 = 0
+        vectorLatimiMedii[1] = int(np.average(latimeJos))
         latimeJos = np.zeros(0)
     print("### vectorLatimiMedii ", vectorLatimiMedii)
 ########################################################################################
@@ -321,24 +275,7 @@ while (cap.isOpened()):
     if not ESTE_PE_MASINA:
         PutLines()
 
-    #try:
-    #    del ObiectDrum
-    #except:
-    #    pass
 
-    #try:
-    #    del ObiectBanda
-    #except:
-     #   pass
-
-   # nrBenziDetectate, _ = Sectiune.nrBenziDetectate()
-  #  if nrBenziDetectate == 2:
- #       ObiectDrum = TwoLanes()
-    #    ObiectDrum.draw(centreSectiuniCompletat, centruRelativ, distantaFataDeAx, nrBenziDetectate)
-    #elif nrBenziDetectate == 1:
-    #    ObiectBanda = OneLane(Sectiune)
-    else:
-        print("Nicio banda detectata!")
 
     if DEBUG_ALL_DATA and ESTE_PE_MASINA:
         print("Benzi gasite:" + str(Sectiune.nrBenziDetectate()))
@@ -359,7 +296,7 @@ while (cap.isOpened()):
 
     try:
 
-        DiferentaFataDeMijloc = Sectiune.distantaFataDeAx
+        DiferentaFataDeMijloc = distantaFataDeAx
         if  DiferentaFataDeMijloc > EroareCentrare:
             pasAdaptare = pasAdaptare - 2
             if (pasAdaptare<(-22)):
@@ -396,16 +333,10 @@ while (cap.isOpened()):
     if (not ESTE_PE_MASINA):
         deseneazaDrum(centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea,
                   inaltimeSectiuneSus, inaltimeSectiuneJos, vectorCentreMedii, intersectie)
-#DA EROARE AICI:
-    #nrBenziDetectate, _ = Sectiune.nrBenziDetectate()
-    #if nrBenziDetectate == 2:
-    #    ObiectDrum.draw()
-   # elif nrBenziDetectate == 1:
-   #     ObiectBanda.draw()
+
 
     if (not ESTE_PE_MASINA) :
-        cv2.putText(img, "Stare: " + str(masina.current_state.value), (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.4,
-                    (250, 250, 250), 2)
+        cv2.putText(img, "Stare: " + str(masina.current_state.value), (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (250, 250, 250), 2)
     else :
         print(masina.current_state.value)
 
