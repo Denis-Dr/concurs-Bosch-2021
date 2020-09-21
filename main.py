@@ -8,6 +8,7 @@ import numpy as np
 from benzi import Banda
 from Observer import DeplasareMasina
 from StopAndPark import stopOrPark
+from PIL import ImageGrab
 
 global serialHandler
 DEBUG_ALL_DATA = False
@@ -168,11 +169,15 @@ counterStop=0
 contorDistMedBenzi0 = 0 # calculam distanda medie intre benzi in primele 3 cadre ale videoului
 contorDistMedBenzi1 = 0
 
-while (cap.isOpened()):
+while True:#(cap.isOpened()):
     t1 = time.time()
     ret, frame = cap.read()
     if ret is False:
         break
+    '''
+    frame = np.array(ImageGrab.grab(bbox=(0, 40, 640, 480)))
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    '''
     img = frame
 
     EsteStop, EsteParcare = stopOrPark(frame, AMPARCAT)
@@ -187,7 +192,7 @@ while (cap.isOpened()):
                     (200, 200, 250), 2)
 
     print("\n ----------- FRAME ", counter, " --------------")
-
+    '''
     if EsteStop :
         print("avem stop")
         print(str(masina.current_state))
@@ -205,7 +210,7 @@ while (cap.isOpened()):
                 CounterFolositPentruAMasuraStarea = 1
         else :
             print("dar nu sunt in starea de mers")
-
+    '''
 
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -262,7 +267,7 @@ while (cap.isOpened()):
     intersectie = Sectiune.detectareIntersectie(binarization, lungimeCadru)
     if intersectie == 1:
         print("--> Urmeaza INTERSECTIE")
-
+    '''
     fps = cap.get(cv2.CAP_PROP_FPS)
 
 
@@ -271,7 +276,7 @@ while (cap.isOpened()):
                     cv2.FONT_HERSHEY_SIMPLEX, 0.4, (50, 50, 50), 2)
     else:
         print("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
-
+    '''
     if not ESTE_PE_MASINA:
         PutLines()
 
@@ -346,10 +351,10 @@ while (cap.isOpened()):
     if (not ESTE_PE_MASINA) :
         cv2.imshow("Image", img)
         cv2.imshow("binarizare", binarization)
-        cv2.waitKey(0)  # 1=readare automata // 0=redare la buton
+        cv2.waitKey(1)  # 1=readare automata // 0=redare la buton
         time.sleep(0.0)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(0) & 0xFF == ord('q'):
         break
 
     #if stopOrPark(img, False) == 1:

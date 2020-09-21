@@ -8,6 +8,7 @@ import numpy as np
 from benzi import Banda
 from Observer import DeplasareMasina
 from StopAndPark import stopOrPark
+from PIL import ImageGrab
 
 global serialHandler
 DEBUG_ALL_DATA = False
@@ -130,38 +131,6 @@ def PutLines():
     cv2.line(img, (int(0.67 * lungimeCadru), inaltimeSectiuneSus), (int(0.67 * lungimeCadru), inaltimeSectiuneJos), (255, 0, 255), 2)
 
 
-def calculLatimeBanda(centreSectiuni):
-    vectorLatimiBanda = [-1, -1]
-    if centreSectiuni[0][1] != -1 and centreSectiuni[0][0] != -1:
-        vectorLatimiBanda[0] = centreSectiuni[0][1] - centreSectiuni[0][0] # latime sus
-
-    if centreSectiuni[1][1] != -1 and centreSectiuni[1][0] != -1:
-        vectorLatimiBanda[1] = centreSectiuni[1][1] - centreSectiuni[1][0]
-    print("### vectorLatimiBanda", vectorLatimiBanda)
-    return vectorLatimiBanda
-
-def completareCentre(centreSectiuni, vectorLatimiMedii): # completeaza centrele nedetectate din matricea centrelor cu ajutorul vectorLatimiBanda
-    centreSectiuniCompletat = np.copy(centreSectiuni)
-
-    if vectorLatimiMedii[0] != -1:
-        if centreSectiuni[0][0] == -1 and centreSectiuni[0][1] != -1:  # completare sectiuni sus
-            centreSectiuniCompletat[0][0] = centreSectiuni[0][1] - vectorLatimiMedii[0]
-            centreSectiuniCompletat[0][1] = centreSectiuni[0][1]
-        elif centreSectiuni[0][0] != -1 and centreSectiuni[0][1] == -1:
-            centreSectiuniCompletat[0][0] = centreSectiuni[0][0]
-            centreSectiuniCompletat[0][1] = centreSectiuni[0][0] + vectorLatimiMedii[0]
-
-    if vectorLatimiMedii[1] != -1:
-        if centreSectiuni[1][0] == -1 and centreSectiuni[1][1] != -1:  # sectiune jos
-            centreSectiuniCompletat[1][0] = centreSectiuni[1][1] - vectorLatimiMedii[1]
-            centreSectiuniCompletat[1][1] = centreSectiuni[1][1]
-        elif centreSectiuni[1][0] != -1 and centreSectiuni[1][1] == -1:
-            centreSectiuniCompletat[1][0] = centreSectiuni[1][0]
-            centreSectiuniCompletat[1][1] = centreSectiuni[1][0] + vectorLatimiMedii[1]
-    print("### centreSectiuniCompletat ", centreSectiuniCompletat)
-    return centreSectiuniCompletat
-
-
 
 
 
@@ -169,13 +138,16 @@ counterStop=0
 contorDistMedBenzi0 = 0 # calculam distanda medie intre benzi in primele 3 cadre ale videoului
 contorDistMedBenzi1 = 0
 
-while (cap.isOpened()):
+while True: #(cap.isOpened()):
     t1 = time.time()
     ret, frame = cap.read()
     if ret is False:
         break
+    '''
+    frame = np.array(ImageGrab.grab(bbox=(0, 40, 640, 480)))
 
-    #img = frame
+    img = frame
+    '''
     points1 = np.float32([[100, 200], [540, 200], [0, 290], [640, 290]])
     points2 = np.float32([[0, 0], [640, 0], [0, 480], [640, 480]])
     P = cv2.getPerspectiveTransform(points1, points2)
@@ -194,7 +166,7 @@ while (cap.isOpened()):
                    (200, 255, 200), 2)
 
     print("\n ----------- FRAME ", counter, " --------------")
-
+    '''
     if EsteStop :
         print("avem stop")
         print(str(masina.current_state))
@@ -212,11 +184,11 @@ while (cap.isOpened()):
                 CounterFolositPentruAMasuraStarea = 1
         else :
             print("dar nu sunt in starea de mers")
-
+    '''
 
 
     gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
-    ret, binarization = cv2.threshold(gray, 192, 255, cv2.THRESH_BINARY)
+    ret, binarization = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY)
 
     inaltimeCadru, lungimeCadru, _ = frame.shape # H si L imagine
     MijlocCamera = int(lungimeCadru / 2.0)
@@ -231,9 +203,9 @@ while (cap.isOpened()):
 #########################################################################################
 ####### calc lat medie banda la fiecare 3 cadre cu detectare ############################
 #########################################################################################
-    vectorLatimiBanda = calculLatimeBanda(centreSectiuni)  # calcul latimi banda
+    vectorLatimiBanda = Sectiune.calculLatimeBanda(centreSectiuni)  # calcul latimi banda
     if contorDistMedBenzi0 <= 3: # CALCUL LATIME MEDIE BANDA DUPA 3 CADRE CU BANDA DETECTATA
-        if ((exceptieDeInceput0 > 0 or (vectorLatimiMedii[0]-35 < vectorLatimiBanda[0] < vectorLatimiMedii[0]+35)) and vectorLatimiBanda[0] != -1 ):
+        if ((exceptieDeInceput0 > 0 or (vectorLatimiMedii[0]-45 < vectorLatimiBanda[0] < vectorLatimiMedii[0]+45)) and vectorLatimiBanda[0] != -1 ):
             latimeSus = np.append( latimeSus, vectorLatimiBanda[0])
             contorDistMedBenzi0 += 1
             if exceptieDeInceput0 > 0:
@@ -244,7 +216,7 @@ while (cap.isOpened()):
         latimeSus = np.zeros(0)
 
     if contorDistMedBenzi1 <= 3:  # CALCUL LATIME MEDIE BANDA DUPA 3 CADRE CU BANDA DETECTATA
-        if ((exceptieDeInceput1 > 0 or (vectorLatimiMedii[1] - 35 < vectorLatimiBanda[1] < vectorLatimiMedii[1] + 35)) and vectorLatimiBanda[1] != -1):
+        if ((exceptieDeInceput1 > 0 or (vectorLatimiMedii[1] - 45 < vectorLatimiBanda[1] < vectorLatimiMedii[1] + 45)) and vectorLatimiBanda[1] != -1):
             latimeJos = np.append(latimeJos, vectorLatimiBanda[1])
             contorDistMedBenzi1 += 1
             if exceptieDeInceput1 > 0:
@@ -259,7 +231,7 @@ while (cap.isOpened()):
 ########################################################################################
 ########################################################################################
 
-    centreSectiuniCompletat = completareCentre(centreSectiuni, vectorLatimiMedii)
+    centreSectiuniCompletat = Sectiune.completareCentre(centreSectiuni, vectorLatimiMedii)
     vectorCentreMedii = Sectiune.calculCentreMedii( centreSectiuniCompletat)
     print("### vectorCentreMedii ", vectorCentreMedii)
     centruRelativ = Sectiune.calculCentruRelativ( vectorCentreMedii)
@@ -271,14 +243,14 @@ while (cap.isOpened()):
     if intersectie == 1:
         print("--> Urmeaza INTERSECTIE")
 
-    fps = cap.get(cv2.CAP_PROP_FPS)
+   # fps = cap.get(cv2.CAP_PROP_FPS)
 
 
-    if not ESTE_PE_MASINA:
-        cv2.putText(img, "FPS: " + str(fps), (10, 20),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.4, (50, 50, 50), 2)
-    else:
-        print("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
+   # if not ESTE_PE_MASINA:
+   #     cv2.putText(img, "FPS: " + str(fps), (10, 20),
+    #                cv2.FONT_HERSHEY_SIMPLEX, 0.4, (50, 50, 50), 2)
+   # else:
+     #   print("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
 
     if not ESTE_PE_MASINA:
         PutLines()
@@ -343,7 +315,16 @@ while (cap.isOpened()):
     print("timp executie", t2, "s")
 
     if (not ESTE_PE_MASINA) :
+        cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
+        cv2.resizeWindow('frame', 960, 720)
+        cv2.imshow("frame", frame)
+
+        cv2.namedWindow('Image', cv2.WINDOW_NORMAL)
+        cv2.resizeWindow('Image', 960, 720)
         cv2.imshow("Image", img)
+
+        cv2.namedWindow('binarizare', cv2.WINDOW_NORMAL)
+        cv2.resizeWindow('binarizare', 960, 720)
         cv2.imshow("binarizare", binarization)
         cv2.waitKey(0)  # 1=readare automata // 0=redare la buton
         time.sleep(0.0)
