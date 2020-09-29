@@ -9,6 +9,13 @@ from benzi import Banda
 from Observer import DeplasareMasina
 from StopAndPark import stopOrPark
 from PIL import ImageGrab
+from flask_opencv_streamer.streamer import Streamer
+
+
+port = 3030
+require_login = False
+streamer = Streamer(port, require_login)
+
 
 global serialHandler
 DEBUG_ALL_DATA = False
@@ -326,7 +333,14 @@ while True: #(cap.isOpened()):
         cv2.namedWindow('binarizare', cv2.WINDOW_NORMAL)
         cv2.resizeWindow('binarizare', 960, 720)
         cv2.imshow("binarizare", binarization)
-        cv2.waitKey(0)  # 1=readare automata // 0=redare la buton
+
+
+        streamer.update_frame(img)
+
+        if not streamer.is_streaming:
+            streamer.start_streaming()
+
+        cv2.waitKey(30)  # 1=readare automata // 0=redare la buton
         time.sleep(0.0)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -335,6 +349,7 @@ while True: #(cap.isOpened()):
     #if stopOrPark(img, False) == 1:
     #    print("STOP")
     #    serialHandler.sendBrake(0)
+
 if ESTE_PE_MASINA:
     serialHandler.sendPidActivation(False)
     serialHandler.close()
