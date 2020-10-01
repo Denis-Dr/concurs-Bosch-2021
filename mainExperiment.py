@@ -322,6 +322,7 @@ while True: #(cap.isOpened()):
     print("timp executie", t2, "s")
 
     if (not ESTE_PE_MASINA) :
+        '''
         cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
         cv2.resizeWindow('frame', 960, 720)
         cv2.imshow("frame", frame)
@@ -333,14 +334,14 @@ while True: #(cap.isOpened()):
         cv2.namedWindow('binarizare', cv2.WINDOW_NORMAL)
         cv2.resizeWindow('binarizare', 960, 720)
         cv2.imshow("binarizare", binarization)
-
+        '''
 
         streamer.update_frame(img)
 
         if not streamer.is_streaming:
             streamer.start_streaming()
 
-        cv2.waitKey(30)  # 1=readare automata // 0=redare la buton
+        cv2.waitKey(1)  # 1=readare automata // 0=redare la buton
         time.sleep(0.0)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
