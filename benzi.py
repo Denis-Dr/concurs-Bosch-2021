@@ -131,7 +131,7 @@ class Banda:
                 self.centreSectiuni[0][0] = Constante.NU_AM_GASIT
                 self.centreSectiuni[1][0] = Constante.NU_AM_GASIT
 
-        print("### centreSectiuni ", self.centreSectiuni)
+
         return self.centreSectiuni  # returnam matricea cu centrele sectiunilor
 
 
@@ -158,12 +158,11 @@ class Banda:
         if self.contor != 0:
             self.centruRelativ = int(self.suma / self.contor)
 
-        print("#### centruRelativ ", self.centruRelativ)
         return self.centruRelativ
 
     def calculDistantaFataDeAx(self,centruRelativ, MijlocCamera): # calc dist dintre centru camera si centru banda
         self.distantaFataDeAx = MijlocCamera - centruRelativ
-        print("### distantaFataDeAx ", self.distantaFataDeAx, "  ### centruRelativ ", centruRelativ, "  ### MijlocCamera", MijlocCamera)
+
         return self.distantaFataDeAx
 
     def nrBenziDetectate(self): # calc nr benzi / partea pe care detect
@@ -228,8 +227,6 @@ class Banda:
                     self.mijloc3 = int((self.sfarsit3 + self.inceput3) / 2)
                     self.vectorIntersectie[2] = self.mijloc3
 
-        print("### vectorIntersectie ", self.vectorIntersectie)
-
         if (self.vectorIntersectie[0] != Constante.NU_AM_GASIT and self.vectorIntersectie[1] != Constante.NU_AM_GASIT and self.vectorIntersectie[2] != Constante.NU_AM_GASIT):
             if (self.vectorIntersectie[0] <= self.vectorIntersectie[1] <= self.vectorIntersectie[2]) or (self.vectorIntersectie[0] >= self.vectorIntersectie[1] >= self.vectorIntersectie[2]):
                 return 1
@@ -243,7 +240,7 @@ class Banda:
 
         if centreSectiuni[1][1] != Constante.NU_AM_GASIT and centreSectiuni[1][0] != Constante.NU_AM_GASIT:
             self.vectorLatimiBanda[1] = centreSectiuni[1][1] - centreSectiuni[1][0]
-        print("### vectorLatimiBanda", self.vectorLatimiBanda)
+
         return self.vectorLatimiBanda
 
     def completareCentre(self, centreSectiuni, vectorLatimiMedii):  # completeaza centrele nedetectate din matricea centrelor cu ajutorul vectorLatimiBanda
@@ -264,7 +261,7 @@ class Banda:
             elif centreSectiuni[1][0] != Constante.NU_AM_GASIT and centreSectiuni[1][1] == Constante.NU_AM_GASIT:
                 self.centreSectiuniCompletat[1][0] = centreSectiuni[1][0]
                 self.centreSectiuniCompletat[1][1] = centreSectiuni[1][0] + vectorLatimiMedii[1]
-        print("### centreSectiuniCompletat ", self.centreSectiuniCompletat)
+
         return self.centreSectiuniCompletat
 
 

@@ -6,9 +6,10 @@ import time
 import cv2
 import numpy as np
 from benzi import Banda
+import deseneaza
 from Observer import DeplasareMasina
 from StopAndPark import stopOrPark
-from PIL import ImageGrab
+#from PIL import ImageGrab
 from flask_opencv_streamer.streamer import Streamer
 
 
@@ -17,11 +18,15 @@ require_login = False
 streamer = Streamer(port, require_login)
 
 
+
 global serialHandler
 DEBUG_ALL_DATA = False
 ESTE_PE_MASINA = False
 VIDEO_RECORD = False
 AMPARCAT=False
+PRINT_DATE = False
+AFISARE_VIDEO = True
+STREAM_VIDEO = True
 
 ## VARIABILE
 cap = cv2.VideoCapture('cameraE.avi')
@@ -57,86 +62,6 @@ class Indicator:
     PARCARE = 2
     Eroare = 3
 
-def deseneazaDrum(centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea, inaltimeSectiuneSus, inaltimeSectiuneJos, vectorCentreMedii, intersectie):
-    cv2.putText(img, "Benzi gasite: " + str(nrBenziDetectate), (10, 430), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (140, 140, 210), 2)
-
-    if centruRelativ != 0:
-        cv2.arrowedLine(img, (int(lungimeCadru / 2), 180), (int(centruRelativ), 180), (255, 255, 125), 2)
-        cv2.putText(img, "Dist: " + str(distantaFataDeAx), (int(lungimeCadru / 2 + 50), 180), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (60, 0, 60), 1)
-        cv2.line(img, (int(centruRelativ), 0), (int(centruRelativ), inaltimeCadru), (255, 125, 125), 5)
-
-    if vectorCentreMedii[0] != -1 and vectorCentreMedii[1] != -1:
-        cv2.circle(img, (vectorCentreMedii[0], inaltimeSectiuneSus), 3, (200, 0, 230), 3)
-        cv2.circle(img, (vectorCentreMedii[1], inaltimeSectiuneJos), 3, (200, 0, 230), 3)
-        cv2.line(img, (vectorCentreMedii[0], inaltimeSectiuneSus), (vectorCentreMedii[1], inaltimeSectiuneJos), (170, 0, 0), 2)
-
-    if nrBenziDetectate == 2:
-        for j in range(2):
-            if centreSectiuni[0][j] != -1:
-                cv2.putText(img, str(centreSectiuniCompletat[0][j]), (centreSectiuniCompletat[0][j] - 20, inaltimeSectiuneSus - 8), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 210, 0), 2)
-                cv2.circle(img, (centreSectiuniCompletat[0][j], inaltimeSectiuneSus), 3, (0, 0, 200), 3)
-            else:
-                cv2.putText(img, str(centreSectiuniCompletat[0][j]), (centreSectiuniCompletat[0][j] - 20, inaltimeSectiuneSus - 8), cv2.FONT_HERSHEY_SIMPLEX, 1,(0, 30, 200), 2)
-                cv2.circle(img, (centreSectiuniCompletat[0][j], inaltimeSectiuneSus), 3, (200, 0, 0), 3)
-
-        for j in range(2):
-            if centreSectiuni[1][j] != -1:
-                cv2.putText(img, str(centreSectiuniCompletat[1][j]), (centreSectiuniCompletat[1][j] - 20, inaltimeSectiuneJos - 8), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 210, 0), 2)
-                cv2.circle(img, (centreSectiuniCompletat[1][j], inaltimeSectiuneJos), 3, (0, 0, 200), 3)
-            else:
-                cv2.putText(img, str(centreSectiuniCompletat[1][j]), (centreSectiuniCompletat[1][j] - 20, inaltimeSectiuneJos - 8), cv2.FONT_HERSHEY_SIMPLEX, 1,(0, 30, 200), 2)
-                cv2.circle(img, (centreSectiuniCompletat[1][j], inaltimeSectiuneJos), 3, (200, 0, 0), 3)
-
-    elif nrBenziDetectate == 1:
-        if partea == "stanga":
-            cv2.putText(img, "Detecteaza banda stanga", (380, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 190), 2)
-            print("Detecteaza banda stanga. Pozitia aprox. a benzii dreapta este: ", centreSectiuniCompletat[0][1], "; ", centreSectiuniCompletat[1][1])
-            if centreSectiuniCompletat[0][0] != -1:
-                cv2.putText(img, str(centreSectiuniCompletat[0][0]), (centreSectiuniCompletat[0][0] - 20, inaltimeSectiuneSus - 8), cv2.FONT_HERSHEY_SIMPLEX, 1, (200, 30, 0), 2)
-                cv2.circle(img, (centreSectiuniCompletat[0][0], inaltimeSectiuneSus), 3, (0, 200, 0), 3)
-
-            if centreSectiuniCompletat[1][0] != -1:
-                cv2.putText(img, str(centreSectiuniCompletat[1][0]), (centreSectiuniCompletat[1][0] - 20, inaltimeSectiuneJos - 8), cv2.FONT_HERSHEY_SIMPLEX, 1, (200, 30, 0), 2)
-                cv2.circle(img, (centreSectiuniCompletat[1][0], inaltimeSectiuneJos), 3, (0, 200, 0), 3)
-
-        elif partea == "dreapta":
-            cv2.putText(img, "Detecteaza banda dreapta", (380, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 190), 2)
-            print("Detecteaza banda dreapta. Pozitia aprox. a benzii stanga este: ", centreSectiuniCompletat[0][0], "; ", centreSectiuniCompletat[1][0])
-            if centreSectiuniCompletat[0][1] != -1:
-                cv2.putText(img, str(centreSectiuniCompletat[0][1]), (centreSectiuniCompletat[0][1] - 20, inaltimeSectiuneSus - 8), cv2.FONT_HERSHEY_SIMPLEX, 1, (200, 30, 0), 2)
-                cv2.circle(img, (centreSectiuniCompletat[0][1], inaltimeSectiuneSus), 3, (0, 200, 0), 3)
-
-            if centreSectiuniCompletat[1][1] != -1:
-                cv2.putText(img, str(centreSectiuniCompletat[1][1]), (centreSectiuniCompletat[1][1] - 20, inaltimeSectiuneJos - 8), cv2.FONT_HERSHEY_SIMPLEX, 1, (200, 30, 0), 2)
-                cv2.circle(img, (centreSectiuniCompletat[1][1], inaltimeSectiuneJos), 3, (0, 200, 0), 3)
-    else:
-        print("Nicio banda detectata!!!")
-
-    if intersectie == 1:
-        cv2.putText(img, "URMEAZA INTERSECTIE", (360, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 90, 255), 2)
-
-
-
-def PutLines():
-    inaltimeCadru, lungimeCadru, _ = frame.shape
-
-    cv2.line(img, (int(0.02 * lungimeCadru), int(inaltimeCadru * 0.5)), (int(0.46*lungimeCadru), int(inaltimeCadru * 0.5)), (255, 255, 0), 2)
-    cv2.line(img, (int(0.54 * lungimeCadru), inaltimeSectiuneSus), (int(0.98 * lungimeCadru), inaltimeSectiuneSus), (255, 255, 0), 2)
-
-    cv2.line(img, (0, inaltimeSectiuneJos), (lungimeCadru, inaltimeSectiuneJos), (255, 255, 0), 2)
-
-    cv2.line(img, (int(lungimeCadru / 2), 0), (int(lungimeCadru / 2), inaltimeCadru), (255, 255, 255), 2) # linia verticala
-
-    cv2.line(binarization, (int(0.02 * lungimeCadru), inaltimeSectiuneSus), (int(0.46 * lungimeCadru), inaltimeSectiuneSus), (255, 255, 0), 2)
-    cv2.line(binarization, (int(0.54 * lungimeCadru), inaltimeSectiuneSus), (int(0.98 * lungimeCadru), inaltimeSectiuneSus), (255, 255, 0), 2)
-
-    cv2.line(binarization, (0, inaltimeSectiuneJos), (lungimeCadru, inaltimeSectiuneJos), (255, 255, 0), 2)
-    cv2.line(binarization, (int(lungimeCadru / 2), 0), (int(lungimeCadru / 2), inaltimeCadru), (255, 255, 255), 2)  # linia verticala
-
-    cv2.line(img, (int(0.33*lungimeCadru), inaltimeSectiuneSus), (int(0.33*lungimeCadru), inaltimeSectiuneJos), (255, 0, 255), 2)
-    cv2.line(img, (int(0.5 * lungimeCadru), inaltimeSectiuneSus), (int(0.5 * lungimeCadru), inaltimeSectiuneJos), (255, 0, 255), 2)
-    cv2.line(img, (int(0.67 * lungimeCadru), inaltimeSectiuneSus), (int(0.67 * lungimeCadru), inaltimeSectiuneJos), (255, 0, 255), 2)
-
 
 
 
@@ -146,7 +71,7 @@ contorDistMedBenzi0 = 0 # calculam distanda medie intre benzi in primele 3 cadre
 contorDistMedBenzi1 = 0
 
 while True: #(cap.isOpened()):
-    t1 = time.time()
+
     ret, frame = cap.read()
     if ret is False:
         break
@@ -172,7 +97,7 @@ while True: #(cap.isOpened()):
         cv2.putText(img, "Cadrul: " + str(counter), (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.4,
                    (200, 255, 200), 2)
 
-    print("\n ----------- FRAME ", counter, " --------------")
+
     '''
     if EsteStop :
         print("avem stop")
@@ -233,18 +158,22 @@ while True: #(cap.isOpened()):
         vectorLatimiMedii[1] = int(np.average(latimeJos))
         latimeJos = np.zeros(0)
 
-
-    print("### vectorLatimiMedii ", vectorLatimiMedii)
 ########################################################################################
 ########################################################################################
 
     centreSectiuniCompletat = Sectiune.completareCentre(centreSectiuni, vectorLatimiMedii)
     vectorCentreMedii = Sectiune.calculCentreMedii( centreSectiuniCompletat)
-    print("### vectorCentreMedii ", vectorCentreMedii)
+
     centruRelativ = Sectiune.calculCentruRelativ( vectorCentreMedii)
     distantaFataDeAx = Sectiune.calculDistantaFataDeAx( centruRelativ, MijlocCamera)
 
     nrBenziDetectate, partea = Sectiune.nrBenziDetectate()
+
+    if PRINT_DATE:
+        print("\n ----------- FRAME ", counter, " --------------")
+        print(" ##centreSectiuni ", centreSectiuni, "\n ##vectorLatimiBanda ", vectorLatimiBanda, "\n ##vectorLatimiMedii ", vectorLatimiMedii, "\n ##centreSectiuniCompletat ",
+              centreSectiuniCompletat,
+              "\n ##vectorCentreMedii ", vectorCentreMedii, "\n ##distantaFataDeAx ", distantaFataDeAx, "  ##centruRelativ ", centruRelativ, "  ##MijlocCamera", MijlocCamera)
 
     intersectie = Sectiune.detectareIntersectie(binarization, lungimeCadru)
     if intersectie == 1:
@@ -260,7 +189,10 @@ while True: #(cap.isOpened()):
      #   print("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
 
     if not ESTE_PE_MASINA:
-        PutLines()
+        deseneaza.PutLines(img, binarization, inaltimeCadru, lungimeCadru, inaltimeSectiuneSus, inaltimeSectiuneJos)
+        deseneaza.deseneazaDrum(PRINT_DATE, img, centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea, inaltimeSectiuneSus, inaltimeSectiuneJos,
+                                vectorCentreMedii,
+				  intersectie, inaltimeCadru, lungimeCadru)
 
 
 
@@ -307,9 +239,6 @@ while True: #(cap.isOpened()):
         print(e)
         pass
 
-    if (not ESTE_PE_MASINA):
-        deseneazaDrum(centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea,
-                  inaltimeSectiuneSus, inaltimeSectiuneJos, vectorCentreMedii, intersectie)
 
 
     #if (not ESTE_PE_MASINA) :
@@ -318,11 +247,9 @@ while True: #(cap.isOpened()):
    # else :
    #     print(masina.current_state.value)
 
-    t2 = time.time() - t1
-    print("timp executie", t2, "s")
 
-    if (not ESTE_PE_MASINA) :
-        '''
+
+    if (not ESTE_PE_MASINA) and AFISARE_VIDEO:
         cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
         cv2.resizeWindow('frame', 960, 720)
         cv2.imshow("frame", frame)
@@ -334,8 +261,8 @@ while True: #(cap.isOpened()):
         cv2.namedWindow('binarizare', cv2.WINDOW_NORMAL)
         cv2.resizeWindow('binarizare', 960, 720)
         cv2.imshow("binarizare", binarization)
-        '''
 
+    if STREAM_VIDEO:
         streamer.update_frame(img)
 
         if not streamer.is_streaming:
