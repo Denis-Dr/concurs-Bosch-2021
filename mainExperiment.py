@@ -9,14 +9,13 @@ from benzi import Banda
 import deseneaza
 from Observer import DeplasareMasina
 from StopAndPark import stopOrPark
-#from PIL import ImageGrab
 from flask_opencv_streamer.streamer import Streamer
+import os
 
 
 port = 3030
 require_login = False
-streamer = Streamer(port, require_login)
-
+streamer = Streamer(port, require_login, stream_res=(640, 480))
 
 
 global serialHandler
@@ -25,7 +24,7 @@ ESTE_PE_MASINA = False
 VIDEO_RECORD = False
 AMPARCAT=False
 PRINT_DATE = False
-AFISARE_VIDEO = True
+AFISARE_VIDEO = False
 STREAM_VIDEO = True
 
 ## VARIABILE
@@ -38,10 +37,7 @@ centruRelativ = 0
 exceptieDeInceput0 = 3 # exceptam primele 3 cadre de la regula de calcul a vectorLatimiMedii pt a obt o latime media reala pe care sa incercam sa o pastram
 exceptieDeInceput1 = 3
 
-
-
 EroareCentrare = 30
-
 
 pasAdaptare = 0
 pozitieMijlocAnterior = -1
@@ -50,11 +46,9 @@ masina = DeplasareMasina()
 ## END OF VARIABLE
 
 
-
 if VIDEO_RECORD:
     fourcc = cv2.VideoWriter_fourcc(*'DIVX')
     out = cv2.VideoWriter('cameraE.avi', fourcc, 20,(640, 480))
-
 
 
 class Indicator:
@@ -63,11 +57,8 @@ class Indicator:
     Eroare = 3
 
 
-
-
-
 counterStop=0
-contorDistMedBenzi0 = 0 # calculam distanda medie intre benzi in primele 3 cadre ale videoului
+contorDistMedBenzi0 = 0  # calculam distanda medie intre benzi
 contorDistMedBenzi1 = 0
 
 while True: #(cap.isOpened()):
@@ -75,11 +66,7 @@ while True: #(cap.isOpened()):
     ret, frame = cap.read()
     if ret is False:
         break
-    '''
-    frame = np.array(ImageGrab.grab(bbox=(0, 40, 640, 480)))
 
-    img = frame
-    '''
     points1 = np.float32([[100, 200], [540, 200], [0, 290], [640, 290]])
     points2 = np.float32([[0, 0], [640, 0], [0, 480], [640, 480]])
     P = cv2.getPerspectiveTransform(points1, points2)
@@ -179,20 +166,20 @@ while True: #(cap.isOpened()):
     if intersectie == 1:
         print("--> Urmeaza INTERSECTIE")
 
-   # fps = cap.get(cv2.CAP_PROP_FPS)
+    fps = cap.get(cv2.CAP_PROP_FPS)
 
-
-   # if not ESTE_PE_MASINA:
-   #     cv2.putText(img, "FPS: " + str(fps), (10, 20),
-    #                cv2.FONT_HERSHEY_SIMPLEX, 0.4, (50, 50, 50), 2)
-   # else:
-     #   print("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
+    '''
+    if not ESTE_PE_MASINA:
+        cv2.putText(img, "FPS: " + str(fps), (10, 20),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.4, (50, 50, 50), 2)
+    else:
+        print("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
+    '''
 
     if not ESTE_PE_MASINA:
         deseneaza.PutLines(img, binarization, inaltimeCadru, lungimeCadru, inaltimeSectiuneSus, inaltimeSectiuneJos)
         deseneaza.deseneazaDrum(PRINT_DATE, img, centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea, inaltimeSectiuneSus, inaltimeSectiuneJos,
-                                vectorCentreMedii,
-				  intersectie, inaltimeCadru, lungimeCadru)
+                                vectorCentreMedii, intersectie, inaltimeCadru, lungimeCadru)
 
 
 
@@ -239,24 +226,22 @@ while True: #(cap.isOpened()):
         print(e)
         pass
 
-
-
-    #if (not ESTE_PE_MASINA) :
-   #     cv2.putText(img, "Stare: " + str(masina.current_state.value), (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.4,
-   #                 (250, 250, 250), 2)
-   # else :
-   #     print(masina.current_state.value)
-
-
+    '''
+    if (not ESTE_PE_MASINA) :
+        cv2.putText(img, "Stare: " + str(masina.current_state.value), (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.4,
+                    (250, 250, 250), 2)
+    else :
+        print(masina.current_state.value)
+    '''
 
     if (not ESTE_PE_MASINA) and AFISARE_VIDEO:
         cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
         cv2.resizeWindow('frame', 960, 720)
         cv2.imshow("frame", frame)
 
-        cv2.namedWindow('Image', cv2.WINDOW_NORMAL)
-        cv2.resizeWindow('Image', 960, 720)
-        cv2.imshow("Image", img)
+        cv2.namedWindow('Img_procesata', cv2.WINDOW_NORMAL)
+        cv2.resizeWindow('Img_procesata', 960, 720)
+        cv2.imshow("Img_procesata", img)
 
         cv2.namedWindow('binarizare', cv2.WINDOW_NORMAL)
         cv2.resizeWindow('binarizare', 960, 720)
@@ -274,10 +259,11 @@ while True: #(cap.isOpened()):
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-    #if stopOrPark(img, False) == 1:
-    #    print("STOP")
-    #    serialHandler.sendBrake(0)
-
+    '''
+    if stopOrPark(img, False) == 1:
+        print("STOP")
+        serialHandler.sendBrake(0)
+    '''
 if ESTE_PE_MASINA:
     serialHandler.sendPidActivation(False)
     serialHandler.close()

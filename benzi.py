@@ -6,7 +6,6 @@ import Constante
 matrice 2x2 cu abscisele centrelor. Inaltimile centrelor sunt prestabilite in fisierul principal.
     Matricea furnizeaza doua informatii: centrele si ne spune daca se detecteaaza banda (elemente != Constante.NU_AM_GASIT).
 '''
-
 class Banda:
     def __init__(self):
         self.centreSectiuni = np.array([[Constante.NU_AM_GASIT, Constante.NU_AM_GASIT], [Constante.NU_AM_GASIT, Constante.NU_AM_GASIT]])  # resetam centreSectiuni[][] dupa fiecare cadru
