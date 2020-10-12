@@ -24,7 +24,7 @@ ESTE_PE_MASINA = False
 VIDEO_RECORD = False
 AMPARCAT=False
 PRINT_DATE = False
-AFISARE_VIDEO = False
+AFISARE_VIDEO = True
 STREAM_VIDEO = True
 
 ## VARIABILE
@@ -235,16 +235,16 @@ while True: #(cap.isOpened()):
     '''
 
     if (not ESTE_PE_MASINA) and AFISARE_VIDEO:
-        cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
-        cv2.resizeWindow('frame', 960, 720)
+        #cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
+        #cv2.resizeWindow('frame', 960, 720)
         cv2.imshow("frame", frame)
 
-        cv2.namedWindow('Img_procesata', cv2.WINDOW_NORMAL)
-        cv2.resizeWindow('Img_procesata', 960, 720)
+        #cv2.namedWindow('Img_procesata', cv2.WINDOW_NORMAL)
+        #cv2.resizeWindow('Img_procesata', 960, 720)
         cv2.imshow("Img_procesata", img)
 
-        cv2.namedWindow('binarizare', cv2.WINDOW_NORMAL)
-        cv2.resizeWindow('binarizare', 960, 720)
+        #cv2.namedWindow('binarizare', cv2.WINDOW_NORMAL)
+        #cv2.resizeWindow('binarizare', 960, 720)
         cv2.imshow("binarizare", binarization)
 
     if STREAM_VIDEO:
@@ -253,7 +253,7 @@ while True: #(cap.isOpened()):
         if not streamer.is_streaming:
             streamer.start_streaming()
 
-        cv2.waitKey(1)  # 1=readare automata // 0=redare la buton
+        cv2.waitKey(0)  # 1=readare automata // 0=redare la buton
         time.sleep(0.0)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
