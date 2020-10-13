@@ -1,5 +1,6 @@
 import SerialHandler
 #dafoarteinteresant
+#comentariu test Denis
 import threading
 import sys
 import imutils
