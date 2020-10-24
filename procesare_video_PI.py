@@ -11,6 +11,7 @@ import io
 import picamera
 from picamera.array import PiRGBArray
 
+
 camera = picamera.PiCamera()
 camera.resolution = (640, 480)
 camera.framerate = 30
