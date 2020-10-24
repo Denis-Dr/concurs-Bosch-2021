@@ -240,6 +240,8 @@ def get_frames():
         cv2.waitKey(1)  # 1=readare automata // 0=redare la buton
         time.sleep(0.0)
 
+        #image.truncate(0)
+
         yield img
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
