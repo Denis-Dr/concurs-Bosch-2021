@@ -2,6 +2,7 @@ import procesare_video_PI as procesare
 import time
 from flask import Flask, render_template, Response
 import cv2
+import numpy as np
 
 
 app = Flask(__name__)
@@ -15,11 +16,13 @@ def index():
 def gen():
     """Video streaming generator function."""
     while True:
-        frame = procesare.get_frames()
-        _, image = cv2.imencode('jpg', frame)
-        imgencoded = image.tobytes()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + imgencoded + b'\r\n')
+        frames = procesare.get_frames()
+
+        for frame in frames:
+            _, image = cv2.imencode('.jpeg', frame)
+            imgencoded = image.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + imgencoded + b'\r\n')
 
 
 

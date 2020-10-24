@@ -19,7 +19,7 @@ def get_frames():
     VIDEO_RECORD = False
     AMPARCAT = False
     PRINT_DATE = False
-    AFISARE_VIDEO = True
+    AFISARE_VIDEO = False
 
     ## VARIABILE
     latimeSus = np.zeros(0)
