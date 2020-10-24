@@ -11,6 +11,9 @@ import io
 import picamera
 from picamera.array import PiRGBArray
 
+camera = picamera.PiCamera()
+camera.resolution = (640, 480)
+camera.framerate = 30
 
 def get_frames():
     global serialHandler
@@ -45,9 +48,7 @@ def get_frames():
     contorDistMedBenzi0 = 0  # calculam distanda medie intre benzi
     contorDistMedBenzi1 = 0
 
-    camera = picamera.PiCamera()
-    camera.resolution = (640, 480)
-    camera.framerate = 30
+
 
     image = np.empty((480, 640, 3), dtype=np.uint8)
     time.sleep(0.1)
