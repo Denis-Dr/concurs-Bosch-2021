@@ -11,12 +11,13 @@ import io
 import picamera
 from picamera.array import PiRGBArray
 
+inFunctiune = False
 
 camera = picamera.PiCamera()
 camera.resolution = (640, 480)
 camera.framerate = 30
 
-def get_frames(porneste):
+def get_frames():
     global serialHandler
     DEBUG_ALL_DATA = False
     ESTE_PE_MASINA = False
@@ -43,7 +44,7 @@ def get_frames(porneste):
     ## END OF VARIABLE
 
 
-
+    global inFunctiune
 
     counterStop = 0
     contorDistMedBenzi0 = 0  # calculam distanda medie intre benzi
@@ -171,7 +172,7 @@ def get_frames(porneste):
         if not ESTE_PE_MASINA:
             deseneaza.PutLines(img, binarization, inaltimeCadru, lungimeCadru, inaltimeSectiuneSus, inaltimeSectiuneJos)
             deseneaza.deseneazaDrum(PRINT_DATE, img, centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea, inaltimeSectiuneSus, inaltimeSectiuneJos,
-                                    vectorCentreMedii, intersectie, inaltimeCadru, lungimeCadru, porneste)
+                                    vectorCentreMedii, intersectie, inaltimeCadru, lungimeCadru, inFunctiune)
 
         if DEBUG_ALL_DATA and ESTE_PE_MASINA:
             print("Benzi gasite:" + str(Sectiune.nrBenziDetectate()))
