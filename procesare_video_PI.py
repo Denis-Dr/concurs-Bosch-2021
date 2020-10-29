@@ -16,13 +16,13 @@ camera = picamera.PiCamera()
 camera.resolution = (640, 480)
 camera.framerate = 30
 
-def get_frames():
+def get_frames(porneste):
     global serialHandler
     DEBUG_ALL_DATA = False
     ESTE_PE_MASINA = False
     VIDEO_RECORD = False
     AMPARCAT = False
-    PRINT_DATE = False
+    PRINT_DATE = True
     AFISARE_VIDEO = False
 
     ## VARIABILE
@@ -171,7 +171,7 @@ def get_frames():
         if not ESTE_PE_MASINA:
             deseneaza.PutLines(img, binarization, inaltimeCadru, lungimeCadru, inaltimeSectiuneSus, inaltimeSectiuneJos)
             deseneaza.deseneazaDrum(PRINT_DATE, img, centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea, inaltimeSectiuneSus, inaltimeSectiuneJos,
-                                    vectorCentreMedii, intersectie, inaltimeCadru, lungimeCadru)
+                                    vectorCentreMedii, intersectie, inaltimeCadru, lungimeCadru, porneste)
 
         if DEBUG_ALL_DATA and ESTE_PE_MASINA:
             print("Benzi gasite:" + str(Sectiune.nrBenziDetectate()))

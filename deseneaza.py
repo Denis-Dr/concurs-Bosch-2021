@@ -2,8 +2,12 @@ import cv2
 
 
 def deseneazaDrum(PRINT_DATE, img, centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea, inaltimeSectiuneSus, inaltimeSectiuneJos, vectorCentreMedii,
-				  intersectie, inaltimeCadru, lungimeCadru):
-	cv2.putText(img, "Benzi gasita: " + str(nrBenziDetectate), (10, 430), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (140, 140, 210), 2)
+				  intersectie, inaltimeCadru, lungimeCadru, porneste):
+	cv2.putText(img, "Benzi gasite: " + str(nrBenziDetectate), (10, 430), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (140, 140, 210), 2)
+	if (porneste == True):
+		cv2.putText(img, "RUNNING", (255, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 250, 0), 2)
+	else:
+		cv2.putText(img, "STOPPED", (255, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 250), 2)
 
 	if centruRelativ != 0:
 		cv2.arrowedLine(img, (int(lungimeCadru / 2), 180), (int(centruRelativ), 180), (255, 255, 125), 2)
