@@ -11,14 +11,14 @@ app = Flask(__name__)
 @app.route('/', methods=['GET', 'POST'])
 def index():
     global porneste
-    if request.method == "POST":
-        if request.form.get("START"):
-            porneste = True
-        elif request.form.get("STOP"):
-            porneste = False
-        return render_template('index.html')
-    elif request.method == "GET":
-        return render_template('index.html')
+    #if request.method == "POST":
+    if request.form.get("START"):
+        porneste = True
+    elif request.form.get("STOP"):
+        porneste = False
+    return render_template('index.html')
+    #elif request.method == "GET":
+        #return render_template('index.html')
 
 
 def gen():

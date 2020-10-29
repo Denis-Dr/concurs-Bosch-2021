@@ -22,7 +22,7 @@ def get_frames(porneste):
     ESTE_PE_MASINA = False
     VIDEO_RECORD = False
     AMPARCAT = False
-    PRINT_DATE = True
+    PRINT_DATE = False
     AFISARE_VIDEO = False
 
     ## VARIABILE
