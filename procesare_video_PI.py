@@ -12,6 +12,7 @@ import picamera
 from picamera.array import PiRGBArray
 
 inFunctiune = False
+inFunctiune_vechi = False
 
 camera = picamera.PiCamera()
 camera.resolution = (640, 480)
@@ -44,7 +45,8 @@ def get_frames():
     ## END OF VARIABLE
 
 
-    global inFunctiune
+    global inFunctiune, inFunctiune_vechi
+
 
     counterStop = 0
     contorDistMedBenzi0 = 0  # calculam distanda medie intre benzi
@@ -55,8 +57,15 @@ def get_frames():
     image = np.empty((480, 640, 3), dtype=np.uint8)
     time.sleep(0.1)
 
-    for cadru in camera.capture_continuous(image, format="bgr", use_video_port=True):
-
+    for cadru in camera.capture_continuous(image, format="bgr", use_video_port=True ): #, splitter_port=0):
+        '''
+        if ((inFunctiune == True) and (inFunctiune_vechi == False)):
+            camera.splitter_port = 1
+            inFunctiune_vechi = True
+        elif (inFunctiune == False and inFunctiune_vechi == True):
+            camera.splitter_port = 2
+            inFunctiune_vechi = False
+        '''
         frame = np.array(cadru)
         
         points1 = np.float32([[100, 200], [540, 200], [0, 290], [640, 290]])
@@ -260,7 +269,7 @@ def get_frames():
         serialHandler.close()
 
     cv2.destroyAllWindows()
-    
+
     
 if __name__ == "__main__":
     get_frames()
