@@ -11,14 +11,14 @@ import io
 import picamera
 from picamera.array import PiRGBArray
 
-inFunctiune = False
-inFunctiune_vechi = False
+#inFunctiune = False
+#inFunctiune_vechi = False
 
 camera = picamera.PiCamera()
 camera.resolution = (640, 480)
 camera.framerate = 30
 
-def get_frames():
+def get_frames_RUNNING():
     global serialHandler
     DEBUG_ALL_DATA = False
     ESTE_PE_MASINA = False
@@ -57,7 +57,7 @@ def get_frames():
     image = np.empty((480, 640, 3), dtype=np.uint8)
     time.sleep(0.1)
 
-    for cadru in camera.capture_continuous(image, format="bgr", use_video_port=True ): #, splitter_port=0):
+    for cadru in camera.capture_continuous(image, format="bgr", use_video_port=True ):
         '''
         if ((inFunctiune == True) and (inFunctiune_vechi == False)):
             camera.splitter_port = 1
@@ -181,7 +181,7 @@ def get_frames():
         if not ESTE_PE_MASINA:
             deseneaza.PutLines(img, binarization, inaltimeCadru, lungimeCadru, inaltimeSectiuneSus, inaltimeSectiuneJos)
             deseneaza.deseneazaDrum(PRINT_DATE, img, centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea, inaltimeSectiuneSus, inaltimeSectiuneJos,
-                                    vectorCentreMedii, intersectie, inaltimeCadru, lungimeCadru, inFunctiune)
+                                    vectorCentreMedii, intersectie, inaltimeCadru, lungimeCadru) #inFunctiune
 
         if DEBUG_ALL_DATA and ESTE_PE_MASINA:
             print("Benzi gasite:" + str(Sectiune.nrBenziDetectate()))
@@ -270,6 +270,22 @@ def get_frames():
 
     cv2.destroyAllWindows()
 
+
+def get_frames_STOPPED():
+    image = np.empty((480, 640, 3), dtype=np.uint8)
+    time.sleep(0.1)
+
+    for cadru in camera.capture_continuous(image, format="bgr", use_video_port=True):
+        frame = np.array(cadru)
+
+        points1 = np.float32([[100, 200], [540, 200], [0, 290], [640, 290]])
+        points2 = np.float32([[0, 0], [640, 0], [0, 480], [640, 480]])
+        P = cv2.getPerspectiveTransform(points1, points2)
+        output = cv2.warpPerspective(frame, P, (640, 480))
+        img = output
+
+        cv2.putText(img, "STOPPED", (180, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 250), 2)
+        yield img
     
 if __name__ == "__main__":
     get_frames()

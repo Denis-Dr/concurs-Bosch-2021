@@ -105,5 +105,3 @@ if __name__=="__main__":
         print("La cadrul avem starea "+str(PARCAREDEJA))
         cv2.imshow("IMG", frame)
         cv2.waitKey(0)
-
-

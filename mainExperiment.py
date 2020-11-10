@@ -253,7 +253,7 @@ while True: #(cap.isOpened()):
         if not streamer.is_streaming:
             streamer.start_streaming()
 
-        cv2.waitKey(0)  # 1=readare automata // 0=redare la buton
+        cv2.waitKey(1)  # 1=readare automata // 0=redare la buton
         time.sleep(0.0)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
