@@ -28,7 +28,7 @@ AFISARE_VIDEO = True
 STREAM_VIDEO = True
 
 ## VARIABILE
-cap = cv2.VideoCapture('cameraE.avi')
+cap = cv2.VideoCapture (0) #('cameraE.avi')
 latimeSus = np.zeros(0)
 latimeJos = np.zeros(0)
 vectorLatimiMedii=np.array([-1, -1])
