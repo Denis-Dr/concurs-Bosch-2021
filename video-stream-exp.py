@@ -159,8 +159,8 @@ def get_frames_RUNNING():
                   "\n ##vectorCentreMedii ", vectorCentreMedii, "\n ##distantaFataDeAx ", distantaFataDeAx, "  ##centruRelativ ", centruRelativ, "  ##MijlocCamera", MijlocCamera)
 
         intersectie = Sectiune.detectareIntersectie(binarization, lungimeCadru)
-        if intersectie == 1:
-            print("--> Urmeaza INTERSECTIE")
+        #if intersectie == 1:
+            #print("--> Urmeaza INTERSECTIE")
 
         # fps = cap.get(cv2.CAP_PROP_FPS)
 
