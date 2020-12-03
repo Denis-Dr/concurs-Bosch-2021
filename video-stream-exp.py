@@ -1,3 +1,4 @@
+import SerialHandler
 import cv2
 import time
 import numpy as np
@@ -17,7 +18,7 @@ cap = cv2.VideoCapture (0) #('cameraE.avi')
 def get_frames_RUNNING():
     global serialHandler
     DEBUG_ALL_DATA = False
-    ESTE_PE_MASINA = False
+    ESTE_PE_MASINA = True
     VIDEO_RECORD = False
     AMPARCAT = False
     PRINT_DATE = False
@@ -45,6 +46,9 @@ def get_frames_RUNNING():
     contorDistMedBenzi0 = 0  # calculam distanda medie intre benzi
     contorDistMedBenzi1 = 0
 
+    if ESTE_PE_MASINA:
+        serialHandler = SerialHandler.SerialHandler("/dev/ttyACM0")
+        serialHandler.startReadThread()
 
     while True:
         ret, frame_mare = cap.read()
@@ -71,8 +75,8 @@ def get_frames_RUNNING():
             continue
         # if VIDEO_RECORD:
         #   out.write(frame)
-        if not ESTE_PE_MASINA:
-            cv2.putText(img, "Cadrul: " + str(counter), (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.4,
+        #if not ESTE_PE_MASINA:
+        cv2.putText(img, "Cadrul: " + str(counter), (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.4,
                         (200, 255, 200), 2)
 
         '''
@@ -110,9 +114,10 @@ def get_frames_RUNNING():
 
         centreSectiuni = Sectiune.calculCentreSectiuni(binarization, lungimeCadru)
 
-        #########################################################################################
+
         ####### calc lat medie banda la fiecare 3 cadre cu detectare ############################
         #########################################################################################
+
         vectorLatimiBanda = Sectiune.calculLatimeBanda(centreSectiuni)  # calcul latimi banda
         if contorDistMedBenzi0 <= 3:  # CALCUL LATIME MEDIE BANDA DUPA 3 CADRE CU BANDA DETECTATA
             if ((exceptieDeInceput0 > 0 or (vectorLatimiMedii[0] - 45 < vectorLatimiBanda[0] < vectorLatimiMedii[0] + 45)) and vectorLatimiBanda[0] != -1):
@@ -167,9 +172,9 @@ def get_frames_RUNNING():
             print("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
         '''
 
-        if not ESTE_PE_MASINA:
-            deseneaza.PutLines(img, binarization, inaltimeCadru, lungimeCadru, inaltimeSectiuneSus, inaltimeSectiuneJos)
-            deseneaza.deseneazaDrum(PRINT_DATE, img, centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea, inaltimeSectiuneSus, inaltimeSectiuneJos,
+
+        deseneaza.PutLines(img, binarization, inaltimeCadru, lungimeCadru, inaltimeSectiuneSus, inaltimeSectiuneJos)
+        deseneaza.deseneazaDrum(PRINT_DATE, img, centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea, inaltimeSectiuneSus, inaltimeSectiuneJos,
                                     vectorCentreMedii, intersectie, inaltimeCadru, lungimeCadru)  # inFunctiune
 
         if DEBUG_ALL_DATA and ESTE_PE_MASINA:
@@ -189,9 +194,9 @@ def get_frames_RUNNING():
                     serialHandler.sendMove(0.20, pasAdaptare)
                     print("<<<<")
                     print("Unghi Adaptat pentru stanga: " + str(pasAdaptare))
-                else:
-                    cv2.putText(img, "O luam la stanga", (10, 380),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
+
+                cv2.putText(img, "O luam la stanga", (10, 380),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
             else:
                 if -EroareCentrare < DiferentaFataDeMijloc < EroareCentrare:
                     if ESTE_PE_MASINA:
@@ -203,9 +208,9 @@ def get_frames_RUNNING():
                         serialHandler.sendMove(0.20, 2.0 + pasAdaptare)
                         print(">>>>>>")
                         print("Unghi Adaptat pentru dreapta:\t" + str(pasAdaptare))
-                    else:
-                        cv2.putText(img, "O luam la dreapta", (10, 380),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
+
+                    cv2.putText(img, "O luam la dreapta", (10, 380),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
                     pasAdaptare = pasAdaptare + 5
                     if (pasAdaptare > (22)):
                         pasAdaptare = 20
