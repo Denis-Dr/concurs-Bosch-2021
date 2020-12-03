@@ -192,24 +192,24 @@ def get_frames_RUNNING():
                     pasAdaptare = -20
                 if ESTE_PE_MASINA:
                     serialHandler.sendMove(0.20, pasAdaptare)
-                    print("<<<<")
-                    print("Unghi Adaptat pentru stanga: " + str(pasAdaptare))
+                    #print("<<<<")
+                    #print("Unghi Adaptat pentru stanga: " + str(pasAdaptare))
 
-                cv2.putText(img, "O luam la stanga", (10, 380),
+                cv2.putText(img, "O luam la stanga " + str(pasAdaptare), (10, 380),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
             else:
                 if -EroareCentrare < DiferentaFataDeMijloc < EroareCentrare:
                     if ESTE_PE_MASINA:
                         serialHandler.sendMove(0.20, 0.0)
-                        print("suntem pe centru")
+                        #print("suntem pe centru")
                     pasAdaptare = 0
                 else:
                     if ESTE_PE_MASINA:
                         serialHandler.sendMove(0.20, 2.0 + pasAdaptare)
-                        print(">>>>>>")
-                        print("Unghi Adaptat pentru dreapta:\t" + str(pasAdaptare))
+                        #print(">>>>>>")
+                        #print("Unghi Adaptat pentru dreapta:\t" + str(pasAdaptare))
 
-                    cv2.putText(img, "O luam la dreapta", (10, 380),
+                    cv2.putText(img, "O luam la dreapta" + str(pasAdaptare), (10, 380),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
                     pasAdaptare = pasAdaptare + 5
                     if (pasAdaptare > (22)):
