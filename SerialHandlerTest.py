@@ -238,7 +238,7 @@ def main():
 #    line.Check()
     try:
         ## PARCARE STARE
-        serialHandler.sendPidActivation(True)
+        serialHandler.sendPidActivation(False) # False = control viteaza pwm / True = control viteza cm/s
         ev1 = threading.Event()
         serialHandler.sendMove(-0.2, 22.0)
         time.sleep(2.7)
@@ -256,7 +256,11 @@ def main():
 
         ##END OF PLECARE
 
-
+        # mers inainte
+        serialHandler.sendMove(15, 0)
+        time.sleep(2.2)
+        serialHandler.sendMove(0, 0)
+        time.sleep(2.7)
 
     except Exception as e:
         print(e)

@@ -476,7 +476,7 @@ class SerialHandler:
     '''
 
     def __init__(self,f_device_File='/dev/ttyACM0',f_history_file='historyFile.txt'):
-        self.serialCon=serial.Serial(f_device_File,460800,timeout=1)
+        self.serialCon=serial.Serial(f_device_File,256000,timeout=1) #460800
         self.historyFile=FileHandler(f_history_file)
         self.readThread=ReadThread(1,self.serialCon,self.historyFile)
         self.lock=threading.Lock()
