@@ -18,7 +18,7 @@ cap = cv2.VideoCapture (0) #('cameraE.avi')
 def get_frames_RUNNING():
     global serialHandler
     DEBUG_ALL_DATA = False
-    ESTE_PE_MASINA = True
+    ESTE_PE_MASINA = False
     VIDEO_RECORD = False
     AMPARCAT = False
     PRINT_DATE = False
@@ -267,9 +267,15 @@ def get_frames_RUNNING():
 def get_frames_STOPPED():
     while True:
 
-        ret, frame = cap.read()
+        ret, frame_mare2 = cap.read()
         if ret is False:
             break
+        H, W, _ = frame_mare2.shape
+        if H > 480 and W > 640:
+            frame2 = cv2.resize(frame_mare2, (640, 480), interpolation=cv2.INTER_AREA)
+        else:
+            frame2 = frame_mare2
+
         '''
         points1 = np.float32([[100, 200], [540, 200], [0, 290], [640, 290]])
         points2 = np.float32([[0, 0], [640, 0], [0, 480], [640, 480]])
@@ -277,8 +283,8 @@ def get_frames_STOPPED():
         output = cv2.warpPerspective(frame, P, (640, 480))
         img = output
         '''
-        cv2.putText(frame, "STOPPED", (180, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 250), 2)
-        yield frame
+        cv2.putText(frame2, "STOPPED", (180, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 250), 2)
+        yield frame2
 
     cap.release()
     #cv2.destroyAllWindows()

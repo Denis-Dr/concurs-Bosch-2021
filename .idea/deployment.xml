@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="RPi3" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true">
+  <component name="PublishConfigData" serverName="Rpi4" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true">
     <serverData>
-      <paths name="RPi3">
+      <paths name="Rpi4">
         <serverdata>
           <mappings>
-            <mapping deploy="/Desktop/BFMC_ProcVideo" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/Desktop/procesare_video" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
