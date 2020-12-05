@@ -14,11 +14,18 @@ cap = cv2.VideoCapture (0) #('cameraE.avi')
 #cap.set(3,640)
 #cap.set(4,480)
 
+global serialHandler
+global ESTE_PE_MASINA
+ESTE_PE_MASINA = True
+
+if ESTE_PE_MASINA:
+    serialHandler = SerialHandler.SerialHandler("/dev/ttyACM0")
+    serialHandler.startReadThread()
 
 def get_frames_RUNNING():
-    global serialHandler
+
     DEBUG_ALL_DATA = False
-    ESTE_PE_MASINA = False
+    #ESTE_PE_MASINA = False
     VIDEO_RECORD = False
     AMPARCAT = False
     PRINT_DATE = False
@@ -46,9 +53,6 @@ def get_frames_RUNNING():
     contorDistMedBenzi0 = 0  # calculam distanda medie intre benzi
     contorDistMedBenzi1 = 0
 
-    if ESTE_PE_MASINA:
-        serialHandler = SerialHandler.SerialHandler("/dev/ttyACM0")
-        serialHandler.startReadThread()
 
     while True:
         ret, frame_mare = cap.read()
@@ -191,7 +195,7 @@ def get_frames_RUNNING():
                 if (pasAdaptare < (-22)):
                     pasAdaptare = -20
                 if ESTE_PE_MASINA:
-                    serialHandler.sendMove(0.20, pasAdaptare)
+                    serialHandler.sendMove(0.16, pasAdaptare)
                     #print("<<<<")
                     #print("Unghi Adaptat pentru stanga: " + str(pasAdaptare))
 
@@ -200,16 +204,18 @@ def get_frames_RUNNING():
             else:
                 if -EroareCentrare < DiferentaFataDeMijloc < EroareCentrare:
                     if ESTE_PE_MASINA:
-                        serialHandler.sendMove(0.20, 0.0)
+                        serialHandler.sendMove(0.18, 0.0)
                         #print("suntem pe centru")
+                    cv2.putText(img, "suntem pe centru", (10, 380),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
                     pasAdaptare = 0
                 else:
                     if ESTE_PE_MASINA:
-                        serialHandler.sendMove(0.20, 2.0 + pasAdaptare)
+                        serialHandler.sendMove(0.16, 2.0 + pasAdaptare)
                         #print(">>>>>>")
                         #print("Unghi Adaptat pentru dreapta:\t" + str(pasAdaptare))
 
-                    cv2.putText(img, "O luam la dreapta" + str(pasAdaptare), (10, 380),
+                    cv2.putText(img, "O luam la dreapta " + str(pasAdaptare), (10, 380),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
                     pasAdaptare = pasAdaptare + 5
                     if (pasAdaptare > (22)):
@@ -267,6 +273,9 @@ def get_frames_RUNNING():
 def get_frames_STOPPED():
     while True:
 
+        if ESTE_PE_MASINA:
+            serialHandler.sendBrake(0.0)
+
         ret, frame_mare2 = cap.read()
         if ret is False:
             break
@@ -285,6 +294,10 @@ def get_frames_STOPPED():
         '''
         cv2.putText(frame2, "STOPPED", (180, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 250), 2)
         yield frame2
+
+    if ESTE_PE_MASINA:
+        serialHandler.sendPidActivation(False)
+        serialHandler.close()
 
     cap.release()
     #cv2.destroyAllWindows()
