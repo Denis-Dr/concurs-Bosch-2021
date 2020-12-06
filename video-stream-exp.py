@@ -16,7 +16,7 @@ cap = cv2.VideoCapture (0) #('cameraE.avi')
 
 global serialHandler
 global ESTE_PE_MASINA
-ESTE_PE_MASINA = True
+ESTE_PE_MASINA = False # <<-----
 
 if ESTE_PE_MASINA:
     serialHandler = SerialHandler.SerialHandler("/dev/ttyACM0")
@@ -103,8 +103,8 @@ def get_frames_RUNNING():
                 print("dar nu sunt in starea de mers")
         '''
 
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        # gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
+        ###gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
         ret, binarization = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY)
 
         inaltimeCadru, lungimeCadru, _ = frame.shape  # H si L imagine
@@ -249,9 +249,14 @@ def get_frames_RUNNING():
         cv2.waitKey(1)  # 1=readare automata // 0=redare la buton
         time.sleep(0.0)
 
-        # image.truncate(0)
-
-        yield img
+        rows_img, cols_img, channels = img.shape
+        rows_binar, cols_binar = binarization.shape
+        rows_concat = rows_img + rows_binar
+        cols_concat = max(cols_img, cols_binar)
+        concat = np.zeros(shape=(rows_concat, cols_concat, channels), dtype=np.uint8)
+        concat[:rows_img, :cols_img] = img
+        concat[rows_img:, :cols_binar] = binarization[:, :, None]
+        yield concat
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
