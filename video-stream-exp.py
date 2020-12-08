@@ -14,8 +14,9 @@ cap = cv2.VideoCapture (0) #('cameraE.avi')
 #cap.set(3,640)
 #cap.set(4,480)
 
+
+THRESHOLD = 130
 global serialHandler
-global ESTE_PE_MASINA
 ESTE_PE_MASINA = False # <<-----
 
 if ESTE_PE_MASINA:
@@ -24,6 +25,8 @@ if ESTE_PE_MASINA:
 
 def get_frames_RUNNING():
 
+    global THRESHOLD
+    global ESTE_PE_MASINA
     DEBUG_ALL_DATA = False
     #ESTE_PE_MASINA = False
     VIDEO_RECORD = False
@@ -105,7 +108,7 @@ def get_frames_RUNNING():
 
         ###gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
-        ret, binarization = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY)
+        ret, binarization = cv2.threshold(gray, THRESHOLD, 255, cv2.THRESH_BINARY)
 
         inaltimeCadru, lungimeCadru, _ = frame.shape  # H si L imagine
         MijlocCamera = int(lungimeCadru / 2.0)
@@ -195,7 +198,7 @@ def get_frames_RUNNING():
                 if (pasAdaptare < (-22)):
                     pasAdaptare = -20
                 if ESTE_PE_MASINA:
-                    serialHandler.sendMove(0.16, pasAdaptare)
+                    serialHandler.sendMove(0.19, pasAdaptare)
                     #print("<<<<")
                     #print("Unghi Adaptat pentru stanga: " + str(pasAdaptare))
 
@@ -204,14 +207,14 @@ def get_frames_RUNNING():
             else:
                 if -EroareCentrare < DiferentaFataDeMijloc < EroareCentrare:
                     if ESTE_PE_MASINA:
-                        serialHandler.sendMove(0.18, 0.0)
+                        serialHandler.sendMove(0.20, 0.0)
                         #print("suntem pe centru")
                     cv2.putText(img, "suntem pe centru", (10, 380),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
                     pasAdaptare = 0
                 else:
                     if ESTE_PE_MASINA:
-                        serialHandler.sendMove(0.16, 2.0 + pasAdaptare)
+                        serialHandler.sendMove(0.19, 2.0 + pasAdaptare)
                         #print(">>>>>>")
                         #print("Unghi Adaptat pentru dreapta:\t" + str(pasAdaptare))
 
@@ -276,6 +279,9 @@ def get_frames_RUNNING():
 
 
 def get_frames_STOPPED():
+    global THRESHOLD
+    global ESTE_PE_MASINA
+
     while True:
 
         if ESTE_PE_MASINA:
@@ -298,7 +304,18 @@ def get_frames_STOPPED():
         img = output
         '''
         cv2.putText(frame2, "STOPPED", (180, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 250), 2)
-        yield frame2
+
+        gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
+        ret, binarization2 = cv2.threshold(gray2, THRESHOLD, 255, cv2.THRESH_BINARY)
+
+        rows_img, cols_img, channels = frame2.shape
+        rows_binar, cols_binar = binarization2.shape
+        rows_concat = rows_img + rows_binar
+        cols_concat = max(cols_img, cols_binar)
+        concat2 = np.zeros(shape=(rows_concat, cols_concat, channels), dtype=np.uint8)
+        concat2[:rows_img, :cols_img] = frame2
+        concat2[rows_img:, :cols_binar] = binarization2[:, :, None]
+        yield concat2
 
     if ESTE_PE_MASINA:
         serialHandler.sendPidActivation(False)
