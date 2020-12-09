@@ -15,16 +15,16 @@ cap = cv2.VideoCapture (0) #('cameraE.avi')
 #cap.set(4,480)
 
 
-THRESHOLD = 130
-global serialHandler
-ESTE_PE_MASINA = False # <<-----
+THRESHOLD = 133
+#global serialHandler
+ESTE_PE_MASINA = True # <<-----
 
 if ESTE_PE_MASINA:
     serialHandler = SerialHandler.SerialHandler("/dev/ttyACM0")
     serialHandler.startReadThread()
 
 def get_frames_RUNNING():
-
+    global serialHandler
     global THRESHOLD
     global ESTE_PE_MASINA
     DEBUG_ALL_DATA = False
@@ -198,7 +198,7 @@ def get_frames_RUNNING():
                 if (pasAdaptare < (-22)):
                     pasAdaptare = -20
                 if ESTE_PE_MASINA:
-                    serialHandler.sendMove(0.19, pasAdaptare)
+                    serialHandler.sendMove(0.15, pasAdaptare)
                     #print("<<<<")
                     #print("Unghi Adaptat pentru stanga: " + str(pasAdaptare))
 
@@ -207,14 +207,14 @@ def get_frames_RUNNING():
             else:
                 if -EroareCentrare < DiferentaFataDeMijloc < EroareCentrare:
                     if ESTE_PE_MASINA:
-                        serialHandler.sendMove(0.20, 0.0)
+                        serialHandler.sendMove(0.15, 0.0)
                         #print("suntem pe centru")
                     cv2.putText(img, "suntem pe centru", (10, 380),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
                     pasAdaptare = 0
                 else:
                     if ESTE_PE_MASINA:
-                        serialHandler.sendMove(0.19, 2.0 + pasAdaptare)
+                        serialHandler.sendMove(0.15, 2.0 + pasAdaptare)
                         #print(">>>>>>")
                         #print("Unghi Adaptat pentru dreapta:\t" + str(pasAdaptare))
 
@@ -223,7 +223,8 @@ def get_frames_RUNNING():
                     pasAdaptare = pasAdaptare + 5
                     if (pasAdaptare > (22)):
                         pasAdaptare = 20
-
+            if nrBenziDetectate == 0:
+                serialHandler.sendBrake(0.0)
         except Exception as e:
             print(e)
             pass
@@ -279,6 +280,7 @@ def get_frames_RUNNING():
 
 
 def get_frames_STOPPED():
+    global serialHandler
     global THRESHOLD
     global ESTE_PE_MASINA
 
@@ -303,10 +305,11 @@ def get_frames_STOPPED():
         output = cv2.warpPerspective(frame, P, (640, 480))
         img = output
         '''
-        cv2.putText(frame2, "STOPPED", (180, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 250), 2)
 
         gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
         ret, binarization2 = cv2.threshold(gray2, THRESHOLD, 255, cv2.THRESH_BINARY)
+
+        cv2.putText(frame2, "STOPPED", (180, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 250), 2)
 
         rows_img, cols_img, channels = frame2.shape
         rows_binar, cols_binar = binarization2.shape
